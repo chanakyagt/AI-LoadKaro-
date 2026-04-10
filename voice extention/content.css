@@ -1,0 +1,63 @@
+#voice-floating-mic {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #10a37f;
+  color: white;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+#voice-dictation-modal {
+  position: fixed;
+  right: 24px;
+  bottom: 100px;
+  width: min(90vw, 420px);
+  background: white;
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  z-index: 2147483647;
+  display: none;
+  font-family: Arial, sans-serif;
+}
+
+#voice-output {
+  width: 100%;
+  min-height: 180px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 15px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.voice-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.voice-actions button {
+  flex: 1;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+#start-record { background: #10a37f; color: white; }
+#stop-copy { background: #111827; color: white; }
+#clear-text { background: #ef4444; color: white; }
+

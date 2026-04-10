@@ -7,12 +7,13 @@ https://youtu.be/jwnyEk_55hU
 
 ## LoadKaro Monorepo
 
-Single repository containing both LoadKaro applications:
+Single repository containing all LoadKaro applications:
 
 - `LoadKaro/` -> mobile app for shippers and truck owners (Expo + React Native)
 - `admin-dashboard/` -> admin/moderator dashboard (Next.js App Router)
+- `voice extention/` -> browser extension for voice transcription workflow
 
-Both apps use the same Supabase backend.
+The mobile app and dashboard use the same Supabase backend.
 
 ## What this repository contains
 
@@ -34,6 +35,11 @@ Both apps use the same Supabase backend.
 - Verification review workflows
 - Universal data table for CRUD/ops screens
 - `/api/admin/*` route handlers using service-role access
+
+### 3) Voice Extension (`voice extention/`)
+- Browser extension with popup/options/recorder UI
+- Content script and background script support
+- Includes extension manifest and icon assets
 
 ## System architecture (high level)
 
@@ -75,6 +81,13 @@ mobile App/
     src/lib/
     middleware.ts
     ...
+  voice extention/              # Browser voice extension
+    manifest.json
+    popup.html
+    recorder.html
+    content.js
+    background.js
+    icons/
 ```
 
 ## Prerequisites
@@ -120,6 +133,12 @@ Run admin dashboard:
 
 ```bash
 npm --workspace admin-dashboard run dev
+```
+
+Load unpacked browser extension:
+
+```text
+Open Chrome/Edge -> Extensions -> Developer mode -> Load unpacked -> select `voice extention/`
 ```
 
 Build dashboard for production:
@@ -197,9 +216,10 @@ git diff --cached --name-only
 
 ## AI assistant context
 
-If an AI coding assistant is used in this repo, treat this as a two-app monorepo with a shared backend contract:
+If an AI coding assistant is used in this repo, treat this as a three-project monorepo:
 - mobile (`LoadKaro`) is user-facing marketplace app
 - dashboard (`admin-dashboard`) is backoffice moderation and operations app
+- extension (`voice extention`) is browser-based voice/transcription UI
 - Supabase schema and policies are source of truth for data constraints and access behavior
 
 When making changes, update relevant docs in `LoadKaro/DOCS_*.md` if behavior or API contracts change.

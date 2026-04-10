@@ -1,0 +1,66 @@
+body {
+  margin: 0;
+  padding: 0;
+  width: 360px;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+}
+
+.container {
+  padding: 18px;
+}
+
+h2 {
+  margin-top: 0;
+  text-align: center;
+}
+
+.record-btn,
+.copy-btn,
+.clear-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.record-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.copy-btn {
+  background: #10b981;
+  color: white;
+}
+
+.clear-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.status {
+  margin-top: 12px;
+  font-size: 14px;
+  text-align: center;
+  color: #444;
+}
+
+textarea {
+  width: 100%;
+  height: 180px;
+  margin-top: 15px;
+  resize: none;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.actions {
+  margin-top: 10px;
+}
