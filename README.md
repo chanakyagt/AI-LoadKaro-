@@ -1,10 +1,11 @@
+# AI-LoadKaro-
+
 https://youtu.be/jwnyEk_55hU
 ---LoadKaro App
----LoadKaro Admin Dashboard 
+---LoadKaro Admin Dashboard
 ---Voice transcriber
 
-
-# LoadKaro Monorepo
+## LoadKaro Monorepo
 
 Single repository containing both LoadKaro applications:
 
