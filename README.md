@@ -1,6 +1,11 @@
 # AI-LoadKaro-
 
 https://youtu.be/jwnyEk_55hU
+
+The reason I selected this project for LoadKaro is a real logistics issue in the Indian trucking marketplace: empty return truck loads. This inflates trucking prices for shippers and also creates inefficiency in load procurement for transporters. I noticed this problem when I shifted to Hyderabad a week ago, and my friend's uncle (also connected to this space) shared the same pain point.
+
+Another recurring problem I personally face is that many websites still do not provide voice typing. I am a voice-first person, so I created a small extension that converts my voice to text, which I can directly copy and paste.
+
 ---LoadKaro App
 ---LoadKaro Admin Dashboard
 ---Voice transcriber
