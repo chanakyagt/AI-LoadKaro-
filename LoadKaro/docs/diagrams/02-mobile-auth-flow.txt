@@ -1,0 +1,39 @@
+DIAGRAM: Mobile App Authentication Flow
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a sequence diagram / flow diagram showing the mobile app authentication process for LoadKaro, a freight marketplace app. Show two parallel paths that merge:
+
+PATH 1 - REGISTRATION (left side):
+1. User opens app → LandingScreen (two buttons: "Create Account" / "Sign In")
+2. Taps "Create Account" → RegisterScreen
+3. Enters: Name, Phone Number, Role (Shipper or Truck Owner)
+4. Phone is validated (Indian mobile: starts with 6-9, 10 digits, formatted as +91XXXXXXXXXX)
+5. App calls Supabase Auth: signInWithOtp({phone})
+6. SMS sent to user's phone
+7. Navigate to OTPScreen (mode: register)
+
+PATH 2 - SIGN IN (right side):
+1. User taps "Sign In" → SignInScreen
+2. Enters phone only
+3. Same validation + OTP send
+4. Navigate to OTPScreen (mode: signin)
+
+MERGE POINT - OTP VERIFICATION:
+1. User enters 6-digit OTP code
+2. App calls Supabase Auth: verifyOtp({phone, token})
+3. If register: INSERT new row into public.users table {id, name, phone, role}
+4. If sign-in: SELECT existing profile from public.users
+5. Resolve dashboard route based on role (shipper → ShipperDashboard, truck_owner → TruckOwnerDashboard)
+6. Update Zustand store with {session, user, dashboardRoute}
+7. Navigator reacts → shows role-specific dashboard
+
+ERROR PATHS (show as red branches):
+- Invalid phone format → Alert
+- OTP send failure → Alert with error message
+- Wrong OTP → Alert "Invalid OTP"
+- No user profile found → Alert
+
+STYLE: Clean, professional, use icons for phone/sms/database. Vertical flow, top to bottom.
+---

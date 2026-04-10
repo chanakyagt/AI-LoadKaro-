@@ -1,0 +1,8 @@
+{
+  "name": "loadkaro-monorepo",
+  "private": true,
+  "workspaces": [
+    "admin-dashboard",
+    "LoadKaro"
+  ]
+}

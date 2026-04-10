@@ -1,0 +1,61 @@
+DIAGRAM: Complete User Journey — Shipper and Truck Owner
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a comprehensive user journey diagram showing how a shipper and a truck owner use LoadKaro from first download to successful freight connection. This is the complete product story.
+
+TWO PARALLEL LANES (side by side):
+
+LEFT LANE — SHIPPER JOURNEY:
+1. Download app → Landing screen
+2. Tap "Create Account" → enter name, phone, select "Shipper" role
+3. Receive OTP on phone → enter 6-digit code → account created
+4. Dashboard shows: Upload Loads, View Previous Loads, View Availabilities, My Profile
+5. Choose language (Hindi/English/Telugu/Kannada) from picker
+6. Upload KYC documents:
+   - Individual: Aadhaar, PAN, Driving License, Other ID
+   - Organization: GST Certificate, Company PAN, Incorporation, Trade License
+7. Status becomes "pending" → admin reviews → "verified" (green badge)
+8. Post a load: select origin city → destination city → loading date → truck category → capacity → payment type → rate
+9. Load appears in marketplace for truck owners to find
+10. Browse available trucks (ViewAvailabilitiesScreen)
+11. See a matching truck → tap "Call Owner" (phone dialer) OR "Show Interest"
+12. Moderator sees interest → calls both parties → facilitates deal
+13. Deal confirmed → truck picks up load
+
+RIGHT LANE — TRUCK OWNER JOURNEY:
+1. Same registration flow (select "Truck Owner" role)
+2. Dashboard shows: Find Return Load, Add Trucks, Manage Trucks, Manage Availabilities, View Loads, My Profile
+3. Choose language from picker
+4. Add trucks: category (open/container/etc.), variant, capacity, permit, GPS
+5. Upload truck documents: RC, Insurance, Driver License, Fitness Certificate
+6. Status "pending" → admin reviews → "verified"
+7. Post availability ("Find Return Load"): select truck → origin → destination → dates → expected rate
+8. Availability appears in marketplace for shippers
+9. Browse open loads (ViewLoadsScreen market)
+10. See a matching load → "Call Shipper" OR "Show Interest"
+11. Moderator facilitates → deal confirmed
+12. Truck picks up load → delivery
+
+CENTER — THE BRIDGE (Moderator):
+Show the admin dashboard in the center:
+- Verification Queue: review documents, approve/reject
+- Leads page: see all interests, update status
+- Users/Trucks tables: manage accounts
+- Activity Log: audit trail
+
+CONNECTIONS:
+- Shipper's "Show Interest" → creates interest record → appears on Leads page
+- Truck Owner's "Show Interest" → same
+- Moderator calls both → updates interest to "contacted" → "matched"
+- Both parties get connected via phone call
+
+BOTTOM — Trust Layer:
+- KYC verification for users
+- Document verification for trucks
+- Verification badges visible on marketplace cards
+- Admin/Moderator oversight
+
+STYLE: This should be the "hero diagram" — the one that tells the entire story at a glance. Use a journey/timeline metaphor. Show real Indian context (truck icon, package icon, phone call). Two colors: blue for shipper path, green for truck owner path, dark gray for moderator. The bridge/connection in the middle should be visually prominent. Landscape, detailed but readable.
+---

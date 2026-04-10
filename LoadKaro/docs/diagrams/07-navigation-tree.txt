@@ -1,0 +1,48 @@
+DIAGRAM: Mobile App Navigation Tree
+TOOL: Excalidraw (hand-drawn style) or Eraser.io
+
+PROMPT:
+---
+Create a tree diagram showing all screens in the LoadKaro mobile app and how users navigate between them.
+
+ROOT: App Launch
+├── Loading Screen (spinner while auth initializes)
+└── Decision: Has session?
+    ├── NO → AuthStack
+    │   ├── LandingScreen
+    │   │   ├── "Create Account" → RegisterScreen
+    │   │   └── "Sign In" → SignInScreen
+    │   ├── RegisterScreen
+    │   │   └── "Send OTP" → OTPScreen (mode: register)
+    │   ├── SignInScreen
+    │   │   └── "Send OTP" → OTPScreen (mode: signin)
+    │   └── OTPScreen
+    │       └── "Verify" → [updates store → switches to AppStack]
+    │
+    └── YES → AppStack (initial screen based on role)
+        ├── ShipperDashboard (role: shipper)
+        │   ├── "Upload Loads" → UploadLoadScreen
+        │   ├── "View Previous Loads" → ViewLoadsScreen (variant: posted)
+        │   ├── "View Availabilities" → ViewAvailabilitiesScreen
+        │   ├── "My Profile" → ProfileScreen
+        │   ├── "Verify" → VerificationModal (KYC upload)
+        │   └── "View Documents" → MyDocumentsModal
+        │
+        ├── TruckOwnerDashboard (role: truck_owner)
+        │   ├── "Find Return Load" → CreateAvailabilityScreen
+        │   ├── "Add Trucks" → AddTruckScreen
+        │   ├── "Manage Trucks" → ManageTrucksScreen
+        │   │   ├── "Edit" → EditTruckScreen
+        │   │   ├── "Delete" → [confirm dialog → delete]
+        │   │   ├── "Verify" → VerificationModal (truck docs)
+        │   │   └── "View Documents" → MyDocumentsModal
+        │   ├── "Manage Availabilities" → ManageAvailabilitiesScreen
+        │   ├── "View Loads" → ViewLoadsScreen (variant: market)
+        │   └── "My Profile" → ProfileScreen
+        │
+        ├── BrokerDashboard (role: broker) — empty, future
+        ├── AdminDashboard (role: admin) — empty, future
+        └── ModeratorDashboard (role: moderator) — empty, future
+
+STYLE: Tree diagram flowing left-to-right or top-to-bottom. Color-code: Auth screens in gray, Shipper screens in blue, Truck Owner screens in green, shared screens in purple. Modals shown as overlays/popups on the tree.
+---

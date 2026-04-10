@@ -1,0 +1,69 @@
+DIAGRAM: Row Level Security Access Model
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a diagram showing how Supabase Row Level Security (RLS) controls data access in the LoadKaro database. Show a matrix/grid style diagram.
+
+TOP SECTION - HOW RLS WORKS:
+Show a flowchart:
+1. Client sends query to PostgreSQL
+2. Check: Is this the service_role key?
+   - YES → Bypass ALL RLS, full access (used by admin dashboard API)
+   - NO → Evaluate RLS policies for this table + command
+3. For SELECT: USING clause must return true for each row
+4. For INSERT: WITH CHECK clause must return true
+5. For UPDATE: USING for existing row + WITH CHECK for new values
+6. For DELETE: USING clause must return true
+
+BOTTOM SECTION - ACCESS MATRIX:
+Create a table/grid showing what each role can do on each table:
+
+COLUMNS: shipper | truck_owner | broker | admin | moderator | service_role
+ROWS (tables):
+
+users:
+- shipper: Read own + all (view), Insert own, Update own
+- truck_owner: Same
+- admin/moderator: Read all (via service role API), Update via API
+- service_role: Full access
+
+trucks:
+- shipper: Read all (via broad policy)
+- truck_owner: Read all, Insert own (if role=truck_owner), Update own (only if unverified), Delete own
+- admin: Full via service role
+- moderator: Read all via service role
+
+loads:
+- shipper: Read own + insert own (if role=shipper), Update own, Delete own
+- truck_owner: Read all (for marketplace browsing)
+- admin: Full via service role
+- moderator: Read + update status via service role
+
+availabilities:
+- shipper: Read where status=available (marketplace)
+- truck_owner: Read own + insert own, Update own, Delete own
+- admin/moderator: Full via service role
+
+interests:
+- authenticated: Insert own (interested_by = self), Read own (interested_by or contacted_party = self)
+- service_role: Full access
+
+verification_submissions + verification_documents:
+- authenticated: Insert if submitted_by = self (and entity is self or own truck), Read own
+- service_role: Full access (admin dashboard reads all)
+
+admin_alerts:
+- admin + moderator: Read + update
+- anyone: Insert (for system triggers)
+- admin only: Delete
+
+audit_log:
+- service_role only: Full access
+- No public access
+
+locations + truck_variants:
+- Everyone: Read (public SELECT true)
+
+STYLE: Clean grid/matrix. Green checkmarks for allowed, red X for denied, yellow dash for conditional. Group by table.
+---

@@ -1,0 +1,64 @@
+DIAGRAM: Admin Dashboard Layout & Page Structure
+TOOL: Excalidraw or Figma
+
+PROMPT:
+---
+Create a wireframe/layout diagram of the LoadKaro admin dashboard showing the sidebar navigation and main content area.
+
+LAYOUT (desktop, landscape):
+
+LEFT SIDEBAR (240px wide, white background, border-right):
+┌─────────────────────────┐
+│  LoadKaro               │
+│  ADMIN (bold, large)    │
+├─────────────────────────┤
+│  OVERVIEW               │  ← section label (tiny, gray, uppercase)
+│  ● Dashboard            │
+├─────────────────────────┤
+│  OPERATIONS             │
+│  ● Loads                │
+│  ● Availabilities       │
+│  ● Leads                │
+│  ● Alerts         (2)   │  ← red badge with count
+├─────────────────────────┤
+│  USERS & VEHICLES       │
+│  ● Users                │
+│  ● Shippers             │
+│  ● Truck Owners         │
+│  ● Trucks               │
+├─────────────────────────┤
+│  VERIFICATION           │
+│  ● Verification Queue (3)│  ← red badge
+├─────────────────────────┤
+│  SETTINGS               │
+│  ● Add Moderator        │
+│  ● Activity Log         │
+├─────────────────────────┤
+│  [ Log out ]            │  ← outline button, full width
+└─────────────────────────┘
+
+MAIN CONTENT AREA (remaining width, light gray background, padding 32px):
+┌──────────────────────────────────────────────┐
+│  [🔍 Search users, trucks, loads...] [Ctrl+K]│  ← global search bar
+│                                              │
+│  Dashboard / Users                           │  ← breadcrumbs
+│                                              │
+│  ┌─ PAGE CONTENT ──────────────────────────┐ │
+│  │                                         │ │
+│  │  (varies by page)                       │ │
+│  │                                         │ │
+│  └─────────────────────────────────────────┘ │
+└──────────────────────────────────────────────┘
+
+ALSO SHOW these page types as small wireframes below:
+
+1. DASHBOARD PAGE: Grid of 8 KPI cards (2 rows of 4) + 2 breakdown bars (Users by Role, Loads by Status)
+
+2. TABLE PAGE (e.g., Users): Title + description, filter bar (search + dropdowns + date range + clear), table with checkboxes + headers + rows + action buttons, pagination bar with page size selector
+
+3. DETAIL PAGE (e.g., User Detail): Header with name + badge + Documents button, 4 info cards, related tables (Trucks, Loads, Verifications, Activity)
+
+4. VERIFICATION QUEUE: 3 summary cards + tab bar (All/Users/Trucks) + queue table
+
+STYLE: Clean wireframe style, no color — just structure. Use consistent spacing and alignment. Show the sidebar as fixed, main content as scrollable.
+---

@@ -1,0 +1,47 @@
+DIAGRAM: Dashboard API Request Lifecycle
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a sequence diagram showing the complete lifecycle of an API request in the LoadKaro admin dashboard. Show two flows side by side:
+
+FLOW 1 - READ (GET /api/admin/data):
+1. Browser (Dashboard page) sends GET request with query params: table, select, page, pageSize, sortColumn, sortAsc, searchColumn, searchValue, filters (JSON), dateColumn, dateFrom, dateTo
+2. API Route Handler receives request
+3. requireDashboardAccess() checks auth:
+   - If bypass mode: read role from cookie
+   - If real auth: check Supabase session + query users.role
+   - Must be "admin" or "moderator"
+4. Check hasServiceRoleKey() — if missing, return 503
+5. Validate inputs: table must be in allowlist (13 tables), select must match regex, sort column must be \w+
+6. Create service role Supabase client (bypasses RLS)
+7. Build query: .select(columns, {count: exact}).order().range()
+8. Apply search: UUID → .eq(), else → .ilike(%value%)
+9. Apply filters: .eq() for each filter
+10. Apply date range: .gte() and .lte() if dateColumn provided
+11. Execute query
+12. Return {data: [...], count: N}
+
+FLOW 2 - WRITE (PATCH /api/admin/row):
+1. Browser sends PATCH with body: {table, id, idField, patch}
+2. Same auth check
+3. filterPatchByAllowlist(table, role, patch):
+   - Look up allowed columns for this table + role combination
+   - Strip sensitive fields (phone, email)
+   - Return only allowed fields, or null if nothing allowed
+4. Special case: admin_alerts with is_handled=true → add handled_at + handled_by
+5. Create service role client
+6. Execute: .update(sanitizedPatch).eq(idField, id)
+7. Fire-and-forget: writeAuditLog({actorId, actorRole, action, entityType, entityId, details})
+   - Auto-detects action type from patch content (verify_user, reject_truck, mark_alert_handled, close_record, update_record)
+8. Return {ok: true}
+
+ERROR RESPONSES (show as red boxes):
+- 400: Invalid table, select, sort, filters JSON, no allowed fields, DB error
+- 401: Unauthorized (no session)
+- 403: Forbidden (wrong role for this table)
+- 500: Server error
+- 503: Missing service role key
+
+STYLE: Vertical sequence diagram with clear swim lanes for Browser, API Handler, Auth, Allowlist, Database, Audit Log.
+---

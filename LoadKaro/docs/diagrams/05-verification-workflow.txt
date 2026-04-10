@@ -1,0 +1,50 @@
+DIAGRAM: Verification Document Workflow (End-to-End)
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a detailed workflow diagram for the LoadKaro verification process. Show the complete journey from document upload to admin review to approval/rejection.
+
+STAGE 1 - MOBILE APP (Document Upload):
+1. User taps "Verify" on their dashboard (user KYC) or truck card (truck verification)
+2. VerificationModal opens
+3. For USER verification: first choose "Individual" or "Organization"
+   - Individual: Aadhaar, PAN, Driving License, Other ID
+   - Organization: GST Certificate, Company PAN, Incorporation Certificate, Trade License
+4. For TRUCK verification: RC, Insurance, Driver License, Fitness Certificate
+5. User picks files (JPEG, PNG, WebP, PDF only, max 10MB each)
+6. On submit, the following happens in sequence:
+   a. INSERT into verification_submissions table (entity_type, entity_id, submitted_by)
+   b. For each file: fetch(uri) → blob → arrayBuffer → upload to Supabase Storage
+      Path: verification-docs/{entity_type}/{entity_id}/{submission_id}/{doc_key}/{timestamp}-{filename}
+   c. INSERT into verification_documents table (one row per file with path, mime_type, size)
+   d. UPDATE users or trucks SET verification_status = 'pending'
+7. User sees success alert: "Documents submitted. Verification pending."
+
+STAGE 2 - ADMIN DASHBOARD (Review):
+1. Admin/Moderator opens "Verification Queue" page
+2. Sees unified list: all pending users + trucks sorted by wait time (oldest first)
+3. Each row shows: Type (User/Truck), Name, Detail, Submitted date, Days waiting (color-coded)
+4. Clicks "Review" → VerificationDocsModal opens
+5. Modal shows all documents for the latest submission
+6. For each document: "View" button generates a 5-minute signed URL → opens in new tab
+7. If multiple submissions exist (history): dropdown to view older submissions
+
+STAGE 3 - DECISION:
+- APPROVE: Admin clicks "Approve"
+  → POST /api/admin/verification/decision {decision: "verified"}
+  → UPDATE users/trucks SET verification_status = 'verified'
+  → UPDATE verification_submissions SET status = 'reviewed', review_decision = 'verified'
+  → INSERT audit_log entry
+- REJECT: Admin clicks "Reject" → enters optional reason → clicks "Confirm reject"
+  → Same flow but decision = 'rejected', rejection_reason saved
+
+STAGE 4 - USER SEES RESULT:
+- On mobile, user's verification badge changes color:
+  - Green: verified
+  - Red: rejected (can resubmit new documents)
+- User can tap "View Documents" to see their latest submission
+- User can tap "Change Documents" to upload new ones (creates new submission, old one becomes history)
+
+STYLE: Vertical flow, 4 stages clearly separated. Use icons for phone/upload/database/admin. Show the Supabase Storage bucket as a cloud icon. Color the approve path green, reject path red.
+---

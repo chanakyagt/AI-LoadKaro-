@@ -1,0 +1,46 @@
+DIAGRAM: Audit Log System
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a diagram showing how the LoadKaro audit logging system works end-to-end.
+
+LEFT SIDE — Triggers (what causes a log entry):
+Show 10 action types as colored boxes:
+- update_record (blue) — any field update via admin API
+- delete_record (red) — any record deletion
+- verify_user (green) — user KYC approved
+- reject_user (red) — user KYC rejected
+- verify_truck (green) — truck docs approved
+- reject_truck (red) — truck docs rejected
+- mark_alert_handled (amber) — alert marked as handled
+- close_record (gray) — load/availability closed
+- create_moderator (purple) — new moderator added via OTP
+- review_verification (indigo) — verification decision made
+
+CENTER — The Flow:
+1. Admin/Moderator performs action in dashboard
+2. API route handler processes the action
+3. After successful DB mutation, writeAuditLog() is called (fire-and-forget)
+4. Audit entry inserted into audit_log table with:
+   - actor_id (who did it)
+   - actor_role (admin or moderator)
+   - action (one of 10 types)
+   - entity_type (users, trucks, loads, etc.)
+   - entity_id (which record)
+   - details (JSONB: changed fields, decision, reason)
+   - created_at (timestamp)
+
+RIGHT SIDE — Viewing the Log:
+1. Admin opens Activity Log page (/admin/activity-log)
+2. Filters: by action type, entity type, date range
+3. Table: When, Action (color-coded badge), Entity, Entity ID, Actor, Details
+4. Pagination: 25 per page
+
+BOTTOM — Security:
+- audit_log table has RLS enabled
+- Only service_role can read/write (no public access)
+- Log entries are immutable (no UPDATE/DELETE policies for non-service roles)
+
+STYLE: Horizontal flow, left to right. Use a ledger/book icon for the audit log. Color-code the action types consistently.
+---

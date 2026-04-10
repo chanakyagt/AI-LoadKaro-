@@ -1,0 +1,47 @@
+DIAGRAM: Status State Machines (all enum lifecycles)
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create 4 state machine diagrams on a single canvas, arranged in a 2x2 grid. Each shows the lifecycle of a status enum in the LoadKaro freight marketplace.
+
+TOP LEFT - User/Truck Verification Status:
+States: unverified (gray) → pending (amber) → verified (green) OR rejected (red)
+Transitions:
+- [Start] → unverified: "Account/truck created"
+- unverified → pending: "User uploads verification documents"
+- pending → verified: "Admin approves"
+- pending → rejected: "Admin rejects (with reason)"
+- rejected → pending: "User resubmits new documents"
+Note: verified is a terminal state (cannot go back)
+
+TOP RIGHT - Load Status:
+States: open (blue) → matched (green) OR cancelled (red) OR closed (gray)
+Transitions:
+- [Start] → open: "Shipper posts load"
+- open → matched: "Connection made with truck owner"
+- open → cancelled: "Shipper cancels"
+- open → closed: "Admin/shipper closes"
+- matched → closed: "Delivery completed"
+Note: All except open are terminal
+
+BOTTOM LEFT - Availability Status:
+States: available (blue) → closed (gray) OR cancelled (red)
+Transitions:
+- [Start] → available: "Truck owner posts availability"
+- available → closed: "Owner closes (truck no longer available)"
+- available → cancelled: "Owner cancels"
+Note: Simple lifecycle, no reverse transitions
+
+BOTTOM RIGHT - Interest/Lead Status:
+States: interested (blue) → contacted (amber) → matched (green) OR expired (gray)
+Transitions:
+- [Start] → interested: "User taps 'Show Interest' on load or availability"
+- interested → contacted: "Moderator calls both parties"
+- contacted → matched: "Deal confirmed between shipper and truck owner"
+- interested → expired: "No action taken, lead goes stale"
+- contacted → expired: "Deal fell through"
+Note: Managed by moderators via admin dashboard
+
+STYLE: Each state machine in its own box with a title. Use consistent colors: blue for active/initial, green for positive terminal, red for negative terminal, amber for in-progress, gray for neutral terminal. Rounded rectangles for states, arrows with labels for transitions.
+---

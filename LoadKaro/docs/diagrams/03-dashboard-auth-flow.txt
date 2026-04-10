@@ -1,0 +1,37 @@
+DIAGRAM: Admin Dashboard Authentication Flow
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a flow diagram for the LoadKaro admin dashboard login process. Show two paths:
+
+PATH 1 - DEV BYPASS (when DASHBOARD_BYPASS_AUTH=true):
+1. User visits /login
+2. Sees two buttons: "Open Admin Dashboard" / "Open Moderator Dashboard"
+3. Click sets cookie "lk-bypass-role" = "admin" or "moderator"
+4. Redirects to /admin/dashboard or /moderator/dashboard
+5. All API routes check this cookie for role
+
+PATH 2 - PRODUCTION (real auth):
+1. User visits /login
+2. Enters email + password
+3. Supabase Auth: signInWithPassword({email, password})
+4. App queries: SELECT role FROM public.users WHERE id = authenticated_user.id
+5. Decision diamond:
+   - If role = "admin" → redirect to /admin/dashboard
+   - If role = "moderator" → redirect to /moderator/dashboard
+   - If any other role → signOut() + show error "Not authorized for LoadKaro Admin"
+
+MIDDLEWARE LAYER (show as horizontal bar):
+- /admin/* routes → require role = admin
+- /moderator/* routes → require role = moderator
+- /api/admin/* → requireDashboardAccess() checks session + role
+- Unauthenticated → redirect to /login
+
+API ROUTE AUTH (show separately):
+- Each API route calls requireDashboardAccess()
+- Returns {ok: true, role, userId} or {ok: false, 401/403 response}
+- Service role client created for DB operations (bypasses RLS)
+
+STYLE: Clean flowchart, decision diamonds for role checks, color-code admin (dark) vs moderator (blue) paths.
+---

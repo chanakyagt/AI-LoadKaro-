@@ -1,0 +1,62 @@
+DIAGRAM: Interest/Lead Flow — From Expression to Facilitation
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a flow diagram showing how the "Show Interest" feature works in LoadKaro and how moderators use it to facilitate connections.
+
+SECTION 1 - INTEREST CREATION (Mobile App):
+
+Path A - Truck owner interested in a load:
+1. Truck owner opens ViewLoadsScreen (market variant)
+2. Browses open loads with route filters
+3. Sees a load card: Mumbai → Nagpur, 10-ton open body, loading tomorrow
+4. Taps "Show Interest" button on the card
+5. App inserts into interests table:
+   - load_id = this load's ID
+   - interested_by = truck owner's user ID
+   - contacted_party = shipper's user ID (who posted the load)
+   - status = "interested"
+6. Alert: "Interest sent! The shipper has been notified."
+7. Truck owner can also tap "Call Shipper" to call directly
+
+Path B - Shipper interested in an availability:
+1. Shipper opens ViewAvailabilitiesScreen
+2. Browses available trucks
+3. Sees availability: Open body, 12-ton, Nagpur → Mumbai, available tomorrow
+4. Taps "Show Interest" on the card
+5. App inserts into interests table:
+   - availability_id = this availability's ID
+   - interested_by = shipper's user ID
+   - contacted_party = truck owner's user ID
+   - status = "interested"
+6. Alert: "Interest sent! The truck owner has been notified."
+7. Shipper can also tap "Call Owner" to call directly
+
+SECTION 2 - MODERATOR FACILITATION (Admin Dashboard):
+
+1. Moderator opens admin dashboard → Leads page (/admin/leads)
+2. Sees table of all interests with:
+   - Interested party (name, role)
+   - Contacted party (name, phone)
+   - Type (Load or Availability badge)
+   - Status (interested / contacted / matched / expired)
+   - Date
+3. Moderator filters by status = "interested" (unactioned leads)
+4. Moderator takes action:
+   a. Calls the interested party: "We have a load/availability matching your need"
+   b. Calls the contacted party: "Someone is interested in your listing"
+   c. If both parties agree: moderator updates status to "contacted"
+   d. If deal is confirmed: moderator updates status to "matched"
+   e. If no response or deal falls through: moderator updates to "expired"
+5. All status changes are audited in audit_log
+
+SECTION 3 - THE BRIDGE (Visual):
+Show the flow as a bridge between two sides:
+- Left side: Shippers posting loads
+- Right side: Truck owners posting availabilities
+- Bridge: interests table + moderator facilitation
+- Below bridge: Admin dashboard "Leads" page
+
+STYLE: Use a narrative/story style diagram. Show real-world context (truck icon, package icon, phone call icon, admin with headset). Make it clear that the moderator is the human bridge between the two sides of the marketplace. Use warm colors. This should tell the business story, not just the technical flow.
+---

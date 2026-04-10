@@ -1,0 +1,47 @@
+DIAGRAM: Multi-Language (i18n) System Architecture
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a diagram showing the multi-language system in the LoadKaro mobile app. Show:
+
+TOP SECTION — Language Selection Flow:
+1. User opens app → LanguageProvider loads saved language from AsyncStorage
+2. Default: English (if no saved preference)
+3. User taps language picker on dashboard → Modal shows 4 options:
+   - English (English)
+   - हिन्दी (Hindi)
+   - తెలుగు (Telugu)
+   - ಕನ್ನಡ (Kannada)
+4. User selects a language → saves to AsyncStorage → app re-renders in new language
+
+MIDDLE SECTION — How Translation Works:
+Show the chain:
+- Screen component calls useTranslation() hook
+- Hook returns t() function from LanguageContext
+- t('call_shipper') → looks up in current language file (e.g., hi.js)
+- Found: returns 'शिपर को कॉल करें'
+- Not found: falls back to en.js
+- Not in en.js either: returns raw key 'call_shipper'
+
+BOTTOM SECTION — File Structure:
+Show a file tree:
+i18n/
+├── LanguageContext.js    (React Context + Provider + useTranslation hook)
+├── en.js                 (English — ~250 keys, master file)
+├── hi.js                 (Hindi — ~250 keys)
+├── te.js                 (Telugu — ~250 keys)
+└── kn.js                 (Kannada — ~250 keys)
+
+RIGHT SIDE — Coverage:
+Show which parts of the app are translated:
+- ✅ Auth screens (Landing, Register, SignIn, OTP)
+- ✅ Dashboard (buttons, labels, greeting)
+- ✅ Profile screen
+- ✅ Marketplace (Call/Interest buttons, empty states, alerts)
+- ✅ Truck management (cards, alerts, validation)
+- ✅ Availability management (labels, alerts, status)
+- ❌ Admin dashboard (English only — staff-facing)
+
+STYLE: Clean, informational diagram with icons (globe for language, phone for app, database for storage). Use flag-like color hints for each language. Landscape layout.
+---

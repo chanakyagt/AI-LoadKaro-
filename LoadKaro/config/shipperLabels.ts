@@ -1,0 +1,50 @@
+export const SHIPPER_LABELS = {
+  upload_load: 'Upload Load',
+  view_previous_loads: 'View Previous Loads',
+  view_available_trucks: 'View Available Trucks',
+
+  origin_state: 'Origin State',
+  origin_city: 'Origin City',
+  destination_state: 'Destination State',
+  destination_city: 'Destination City',
+
+  loading_date: 'Loading Date',
+  truck_category_required: 'Truck Category',
+  capacity_required: 'Capacity Required',
+  payment_type: 'Payment Type',
+  full_advance: 'Full Advance',
+  partial_advance: 'Partial Advance',
+  after_delivery: 'After Delivery',
+  advance_percentage: 'Advance Percentage',
+  rate_optional: 'Rate (Optional)',
+
+  submit: 'Submit',
+  field_required: 'is required',
+  error_invalid_date: 'Invalid Date',
+  success_load_created: 'Load created successfully.',
+
+  required_marker: '*',
+  select_placeholder: 'Select…',
+  select_date: 'Select Date',
+  yes: 'Yes',
+  no: 'No',
+
+  status: 'Status',
+  no_loads: 'No loads found.',
+  no_available_trucks: 'No available trucks found.',
+  load_error: 'Could not load data.',
+  truck_details_unavailable:
+    'Truck details could not be loaded. Ask an admin to allow shippers to read trucks tied to active availabilities (RLS).',
+  save_error: 'Could not save. Please try again.',
+
+  truck: 'Truck',
+  owner: 'Owner',
+  phone: 'Phone',
+  capacity: 'Capacity',
+  gps: 'GPS',
+  verification_status: 'Verification Status',
+  origin: 'Origin',
+  destination: 'Destination',
+  available_from: 'Available From',
+  available_till: 'Available Till',
+} as const;

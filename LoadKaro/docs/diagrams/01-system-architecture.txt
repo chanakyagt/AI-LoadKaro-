@@ -1,0 +1,40 @@
+DIAGRAM: LoadKaro System Architecture
+TOOL: Eraser.io → "Diagram from prompt" or draw.io
+
+PROMPT:
+---
+Create a system architecture diagram for a freight marketplace platform called "LoadKaro" with 3 main components arranged horizontally:
+
+LEFT BOX - "LoadKaro Mobile App" (React Native / Expo)
+- Contains 3 sub-blocks stacked vertically:
+  - "Shipper Interface" (icon: package/box)
+  - "Truck Owner Interface" (icon: truck)
+  - "Verification & Documents" (icon: document/shield)
+- Label at bottom: "Supabase JS Client (anon key)"
+
+CENTER BOX - "Supabase Backend" (cloud/server style)
+- Contains 3 sub-blocks:
+  - "Supabase Auth" with subtitle "Phone OTP + Email/Password"
+  - "PostgreSQL Database" with subtitle "11 tables, RLS enabled, 34 policies"
+  - "Supabase Storage" with subtitle "verification-docs bucket (private)"
+- This is the central hub — all arrows go through it
+
+RIGHT BOX - "Admin Dashboard" (Next.js)
+- Contains 3 sub-blocks:
+  - "Admin Pages" (icon: settings/gear)
+  - "Moderator Pages" (icon: user-check)
+  - "API Routes (/api/admin/*)" (icon: code/api)
+- Label at bottom: "Service Role Key (bypasses RLS)"
+
+CONNECTIONS (arrows with labels):
+- Mobile App → Supabase Auth: "Phone OTP login"
+- Mobile App → PostgreSQL: "CRUD via anon client + RLS"
+- Mobile App → Storage: "Upload verification docs"
+- Admin Dashboard → Supabase Auth: "Email/password login"
+- Admin Dashboard API Routes → PostgreSQL: "Service role (full access)"
+- Admin Dashboard API Routes → Storage: "Signed URLs for doc review"
+
+COLOR SCHEME: Use dark gray (#111827) for headers, light gray (#f9fafb) for backgrounds, blue accents for data flow arrows, green for auth arrows.
+
+SIZE: Landscape, roughly 1200x600px
+---

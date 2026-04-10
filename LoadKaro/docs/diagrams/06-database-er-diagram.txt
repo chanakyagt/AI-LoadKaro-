@@ -1,0 +1,131 @@
+DIAGRAM: Database Entity Relationship Diagram
+TOOL: Eraser.io → "ER diagram from prompt" OR draw.io (import as SQL/ER)
+
+PROMPT:
+---
+Create an Entity Relationship diagram for the LoadKaro freight marketplace database. 11 tables in PostgreSQL. Show all tables with their key columns and all relationships.
+
+TABLES AND THEIR KEY COLUMNS:
+
+1. auth.users (external, Supabase Auth)
+   - id (uuid, PK)
+
+2. users
+   - id (uuid, PK, FK → auth.users.id)
+   - name (text, nullable)
+   - phone (text, UNIQUE)
+   - role (enum: shipper, truck_owner, broker, moderator, admin)
+   - verification_status (enum: unverified, pending, verified, rejected)
+   - subscription_type (enum: free, premium, enterprise)
+   - created_at, updated_at
+
+3. truck_variants (31 rows, lookup table)
+   - id (uuid, PK)
+   - category (enum: open, container, lcv, mini_pickup, trailer, tipper, tanker, dumper, bulker)
+   - display_name (text)
+   - is_active (boolean)
+
+4. trucks
+   - id (uuid, PK)
+   - owner_id (uuid, FK → users.id)
+   - category (enum, same as truck_variants)
+   - variant_id (uuid, FK → truck_variants.id)
+   - capacity_tons (numeric)
+   - permit_type (enum: national_permit, state_permit, all_india_permit, goods_carriage, contract_carriage)
+   - gps_available (boolean)
+   - verification_status (enum: unverified, pending, verified, rejected)
+   - axle_count, wheel_count, internal_length/width/height
+
+5. locations (2,166 rows, pre-seeded Indian cities)
+   - id (uuid, PK)
+   - state (text)
+   - city (text)
+   - latitude, longitude
+
+6. loads
+   - id (uuid, PK)
+   - posted_by (uuid, FK → users.id)
+   - origin_location_id (uuid, FK → locations.id)
+   - destination_location_id (uuid, FK → locations.id)
+   - loading_date (date)
+   - truck_category_required (enum)
+   - capacity_required (numeric)
+   - payment_type (enum: advance, partial_advance, after_delivery)
+   - advance_percentage (integer, CHECK 1-100)
+   - rate_optional (numeric)
+   - status (enum: open, matched, cancelled, closed)
+
+7. availabilities
+   - id (uuid, PK)
+   - owner_id (uuid, FK → users.id)
+   - truck_id (uuid, FK → trucks.id)
+   - origin_location_id (uuid, FK → locations.id)
+   - destination_location_id (uuid, FK → locations.id)
+   - available_from (date), available_till (date)
+   - expected_rate (numeric)
+   - status (enum: available, closed, cancelled)
+
+8. interests
+   - id (uuid, PK)
+   - load_id (uuid, FK → loads.id, nullable)
+   - availability_id (uuid, FK → availabilities.id, nullable)
+   - interested_by (uuid, FK → auth.users.id)
+   - contacted_party (uuid, FK → auth.users.id)
+   - status (enum: interested, contacted, matched, expired)
+
+9. admin_alerts
+   - id (uuid, PK)
+   - load_id (uuid, FK → loads.id, UNIQUE)
+   - is_handled (boolean)
+   - handled_by (uuid, FK → users.id)
+   - handled_at (timestamptz)
+
+10. verification_submissions
+    - id (uuid, PK)
+    - entity_type (text: 'user' or 'truck')
+    - entity_id (uuid)
+    - submitted_by (uuid, FK → auth.users.id)
+    - status (text: 'submitted' or 'reviewed')
+    - review_decision (text: 'verified' or 'rejected', nullable)
+    - reviewed_by (uuid, FK → auth.users.id)
+    - rejection_reason (text)
+
+11. verification_documents
+    - id (uuid, PK)
+    - submission_id (uuid, FK → verification_submissions.id, CASCADE)
+    - doc_key (text), path (text), bucket (text)
+    - original_filename, mime_type, size_bytes
+
+12. audit_log
+    - id (uuid, PK)
+    - actor_id (uuid, FK → auth.users.id)
+    - action (text), entity_type (text), entity_id (text)
+    - details (jsonb)
+
+RELATIONSHIPS (draw as lines with cardinality):
+- auth.users 1──1 users (id)
+- users 1──* trucks (owner_id)
+- users 1──* loads (posted_by)
+- users 1──* availabilities (owner_id)
+- users 1──* admin_alerts (handled_by)
+- truck_variants 1──* trucks (variant_id)
+- trucks 1──* availabilities (truck_id)
+- locations 1──* loads (origin + destination)
+- locations 1──* availabilities (origin + destination)
+- loads 1──1 admin_alerts (load_id, UNIQUE)
+- loads 1──* interests (load_id)
+- availabilities 1──* interests (availability_id)
+- auth.users 1──* interests (interested_by + contacted_party)
+- auth.users 1──* verification_submissions (submitted_by + reviewed_by)
+- verification_submissions 1──* verification_documents (submission_id)
+- auth.users 1──* audit_log (actor_id)
+
+STYLE: Group related tables together:
+- Core: users, trucks, truck_variants (top left)
+- Marketplace: loads, availabilities, interests (center)
+- Locations: locations (top right, connected to loads + availabilities)
+- Verification: verification_submissions, verification_documents (bottom left)
+- Admin: admin_alerts, audit_log (bottom right)
+
+Use standard ER notation (crow's foot). Color-code by group.
+---

@@ -1,0 +1,57 @@
+DIAGRAM: Core Marketplace Flow — How Shippers and Truck Owners Connect
+TOOL: Eraser.io → "Diagram from prompt"
+
+PROMPT:
+---
+Create a visual diagram showing how the LoadKaro freight marketplace connects shippers with truck owners. This is the core product flow. Use a two-column layout:
+
+LEFT COLUMN - SHIPPER SIDE:
+1. Shipper logs in (phone OTP)
+2. Shipper posts a load:
+   - Origin city → Destination city
+   - Loading date
+   - Truck category needed (open, container, etc.)
+   - Capacity required (tons)
+   - Payment type (advance / partial / after delivery)
+   - Optional rate
+3. Load appears in marketplace (status: "open")
+4. Shipper can also BROWSE available trucks (ViewAvailabilitiesScreen)
+5. On each availability card, shipper sees:
+   - Truck type, capacity, GPS availability
+   - Owner name + verification badge
+   - Expected rate
+   - "Call Owner" button (opens phone dialer)
+   - "Show Interest" button (records in database)
+
+RIGHT COLUMN - TRUCK OWNER SIDE:
+1. Truck owner logs in (phone OTP)
+2. Truck owner registers trucks (category, variant, capacity, permit)
+3. Truck owner posts availability:
+   - Select truck
+   - Origin → Destination
+   - Available from → Available till
+   - Expected rate
+4. Availability appears in marketplace (status: "available")
+5. Truck owner can BROWSE open loads (ViewLoadsScreen variant=market)
+6. On each load card, truck owner sees:
+   - Route, date, category, capacity
+   - Shipper name + verification badge
+   - Rate (if provided)
+   - "Call Shipper" button
+   - "Show Interest" button
+
+CENTER - CONNECTION LAYER:
+- Arrow from "Show Interest" (both sides) → interests table in database
+- Arrow from interests table → Admin/Moderator Dashboard "Leads" page
+- Moderator sees all interests, can update status: interested → contacted → matched → expired
+- Moderator proactively calls both parties to facilitate the deal
+- Both parties can also directly call each other via the "Call" button
+
+BOTTOM - TRUST LAYER:
+- Verification badges visible on all marketplace cards
+- Users must upload KYC documents (Aadhaar/PAN for individuals, GST/incorporation for organizations)
+- Trucks must have RC, insurance, driver license, fitness certificate
+- Admin/moderator reviews and approves/rejects
+
+STYLE: Use a bridge/marketplace metaphor visually. Shipper side in blue tones, truck owner side in green tones, moderator in dark gray. Show the "interest" as the bridge connecting both sides.
+---
