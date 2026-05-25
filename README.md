@@ -202,3 +202,5 @@ If an AI coding assistant is used in this repo, treat this as a two-app monorepo
 - Supabase schema and policies are source of truth for data constraints and access behavior
 
 When making changes, update relevant docs in `LoadKaro/DOCS_*.md` if behavior or API contracts change.
+
+For QA defect review and fix status (May 2026), see [QA_IMPLEMENTATION_HISTORY.md](QA_IMPLEMENTATION_HISTORY.md).
