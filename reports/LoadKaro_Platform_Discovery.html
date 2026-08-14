@@ -1,0 +1,1629 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LoadKaro — Platform Discovery Document</title>
+<style>
+  :root{
+    --navy:#0C2356; --navy-deep:#07173B; --navy-tint:#1B3578; --navy-soft:#EEF1FA;
+    --orange:#FB4B0A; --orange-dark:#DC3F05; --orange-soft:#FFF1EA;
+    --ink:#13203B; --text:#1F2937; --muted:#6B7280; --faint:#9AA3B2;
+    --line:#E6E9F1; --line-soft:#F0F2F8; --bg:#F4F6FB; --surface:#fff;
+    --ok:#0E8A57; --ok-soft:#D7F2E5; --warn:#B7791F; --warn-soft:#FCEFC7;
+    --danger:#D11A2A; --danger-soft:#FDE6E6;
+    --mono:"Cascadia Mono","Consolas","SF Mono",monospace;
+  }
+  @page { size: A4; margin: 16mm 14mm 18mm 14mm; }
+  @page :first { margin: 0; }
+
+  *{ box-sizing:border-box; }
+  html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  body{
+    margin:0; font-family:"Segoe UI",-apple-system,system-ui,Roboto,Helvetica,Arial,sans-serif;
+    font-size:9.6pt; line-height:1.5; color:var(--text); background:#fff;
+  }
+
+  /* ---------- cover ---------- */
+  .cover{
+    height:297mm; width:100%; page-break-after:always; position:relative;
+    background:linear-gradient(155deg,var(--navy-deep) 0%,var(--navy) 55%,var(--navy-tint) 100%);
+    color:#fff; padding:26mm 18mm; display:flex; flex-direction:column;
+  }
+  .cover::after{
+    content:""; position:absolute; right:-60mm; bottom:-70mm; width:190mm; height:190mm;
+    border-radius:50%; background:rgba(251,75,10,.14);
+  }
+  .cover-mark{ display:flex; align-items:center; gap:10px; margin-bottom:auto; position:relative; z-index:1; }
+  .cover-apex{
+    width:26px; height:26px; background:var(--orange);
+    clip-path:polygon(50% 0,100% 100%,50% 74%,0 100%);
+  }
+  .cover-brand{ font-size:13pt; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+  .cover-kicker{ position:relative; z-index:1; color:var(--orange); font-size:9.5pt; font-weight:700;
+    letter-spacing:.22em; text-transform:uppercase; margin-bottom:6mm; }
+  .cover h1{ position:relative; z-index:1; font-size:34pt; line-height:1.06; margin:0 0 6mm; font-weight:800; letter-spacing:-.02em; }
+  .cover-sub{ position:relative; z-index:1; font-size:12pt; color:#C9D3EC; max-width:120mm; line-height:1.5; }
+  .cover-meta{ position:relative; z-index:1; margin-top:auto; display:grid; grid-template-columns:repeat(3,1fr);
+    gap:6mm; border-top:1px solid rgba(255,255,255,.22); padding-top:6mm; }
+  .cover-meta div span{ display:block; font-size:7.5pt; letter-spacing:.16em; text-transform:uppercase; color:#8FA3CE; margin-bottom:2mm; }
+  .cover-meta div strong{ font-size:10.5pt; font-weight:700; color:#fff; }
+
+  /* ---------- typography ---------- */
+  h2{
+    font-size:16pt; color:var(--navy); margin:0 0 4mm; padding-bottom:2.5mm;
+    border-bottom:2.5px solid var(--orange); font-weight:800; letter-spacing:-.01em;
+  }
+  h2 .num{ color:var(--orange); font-variant-numeric:tabular-nums; margin-right:3mm; }
+  h3{ font-size:11.5pt; color:var(--navy); margin:7mm 0 2.5mm; font-weight:750; }
+  h4{ font-size:9.8pt; color:var(--navy-tint); margin:5mm 0 2mm; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+  p{ margin:0 0 3mm; }
+  ul,ol{ margin:0 0 3mm; padding-left:5mm; }
+  li{ margin-bottom:1.4mm; }
+  a{ color:var(--navy-tint); text-decoration:none; }
+  code{ font-family:var(--mono); font-size:8.5pt; background:var(--navy-soft); color:var(--navy-deep);
+    padding:.5mm 1.2mm; border-radius:2px; }
+  strong{ color:var(--ink); font-weight:700; }
+
+  section{ page-break-inside:auto; }
+  .sec{ page-break-before:always; }
+  .nobreak{ page-break-inside:avoid; }
+
+  /* ---------- tables ---------- */
+  table{ width:100%; border-collapse:collapse; margin:0 0 4mm; font-size:8.6pt; page-break-inside:auto; }
+  thead{ display:table-header-group; }
+  tr{ page-break-inside:avoid; }
+  th{
+    background:var(--navy); color:#fff; text-align:left; font-weight:700; font-size:7.8pt;
+    letter-spacing:.07em; text-transform:uppercase; padding:2mm 2.2mm; border:1px solid var(--navy);
+  }
+  td{ padding:1.8mm 2.2mm; border:1px solid var(--line); vertical-align:top; }
+  tbody tr:nth-child(even) td{ background:#FAFBFE; }
+  td code{ background:transparent; padding:0; color:var(--navy-deep); }
+
+  /* ---------- callouts ---------- */
+  .note{ border-left:3px solid var(--navy-tint); background:var(--navy-soft); padding:2.5mm 3.5mm;
+    margin:0 0 4mm; border-radius:0 3px 3px 0; page-break-inside:avoid; }
+  .warn{ border-left:3px solid var(--warn); background:var(--warn-soft); padding:2.5mm 3.5mm;
+    margin:0 0 4mm; border-radius:0 3px 3px 0; page-break-inside:avoid; }
+  .danger{ border-left:3px solid var(--danger); background:var(--danger-soft); padding:2.5mm 3.5mm;
+    margin:0 0 4mm; border-radius:0 3px 3px 0; page-break-inside:avoid; }
+  .note b,.warn b,.danger b{ display:block; font-size:8pt; text-transform:uppercase; letter-spacing:.08em; margin-bottom:1mm; }
+  .note b{ color:var(--navy); } .warn b{ color:var(--warn); } .danger b{ color:var(--danger); }
+
+  /* ---------- pills ---------- */
+  .pill{ display:inline-block; font-size:7.4pt; font-weight:700; padding:.6mm 2mm; border-radius:8px;
+    letter-spacing:.04em; text-transform:uppercase; }
+  .p-ok{ background:var(--ok-soft); color:var(--ok); }
+  .p-warn{ background:var(--warn-soft); color:var(--warn); }
+  .p-dang{ background:var(--danger-soft); color:var(--danger); }
+  .p-navy{ background:var(--navy-soft); color:var(--navy); }
+  .p-org{ background:var(--orange-soft); color:var(--orange-dark); }
+
+  /* ---------- architecture diagram ---------- */
+  .diagram{ border:1px solid var(--line); border-radius:5px; padding:5mm; margin:0 0 5mm;
+    background:linear-gradient(#FCFDFF,#F6F8FD); page-break-inside:avoid; }
+  .tier{ margin-bottom:4mm; }
+  .tier:last-child{ margin-bottom:0; }
+  .tier-label{ font-size:7.4pt; font-weight:800; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--faint); margin-bottom:2mm; }
+  .row{ display:flex; gap:3mm; align-items:stretch; }
+  .box{ flex:1; border:1.5px solid var(--navy); border-radius:4px; background:#fff; padding:2.8mm 3mm; }
+  .box.accent{ border-color:var(--orange); }
+  .box.ghost{ border-style:dashed; border-color:var(--faint); background:#FAFBFE; }
+  .box h5{ margin:0 0 1.2mm; font-size:9pt; color:var(--navy); font-weight:750; }
+  .box.accent h5{ color:var(--orange-dark); }
+  .box .tech{ font-family:var(--mono); font-size:7.4pt; color:var(--muted); display:block; margin-bottom:1.5mm; }
+  .box ul{ margin:0; padding-left:3.6mm; font-size:7.8pt; color:var(--text); }
+  .box li{ margin-bottom:.5mm; }
+
+  .flow{ display:flex; align-items:center; justify-content:center; gap:2mm; margin:2.5mm 0; }
+  .flow .arrow{ font-size:12pt; color:var(--orange); line-height:1; }
+  .flow .lbl{ font-family:var(--mono); font-size:7.2pt; color:var(--navy-tint);
+    background:#fff; border:1px solid var(--line); border-radius:10px; padding:.8mm 2.4mm; }
+
+  /* ---------- sequence / step list ---------- */
+  .steps{ counter-reset:s; list-style:none; padding:0; margin:0 0 4mm; }
+  .steps li{ counter-increment:s; position:relative; padding-left:8mm; margin-bottom:2mm; font-size:8.8pt; }
+  .steps li::before{
+    content:counter(s); position:absolute; left:0; top:.2mm; width:5mm; height:5mm; border-radius:50%;
+    background:var(--navy); color:#fff; font-size:7pt; font-weight:800; display:flex; align-items:center; justify-content:center;
+  }
+
+  /* ---------- key/value grid ---------- */
+  .kv{ display:grid; grid-template-columns:repeat(2,1fr); gap:2.5mm; margin:0 0 4mm; }
+  .kv .cell{ border:1px solid var(--line); border-left:3px solid var(--orange); border-radius:0 3px 3px 0;
+    padding:2.2mm 3mm; background:#fff; }
+  .kv .cell span{ display:block; font-size:7.2pt; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); margin-bottom:.8mm; }
+  .kv .cell strong{ font-size:9.2pt; color:var(--navy); }
+
+  /* ---------- toc ---------- */
+  .toc{ column-count:2; column-gap:8mm; font-size:9pt; }
+  .toc a{ display:block; padding:1.3mm 0; border-bottom:1px dotted var(--line); color:var(--text);
+    break-inside:avoid; }
+  .toc a b{ color:var(--orange); display:inline-block; width:7mm; }
+
+  pre{ font-family:var(--mono); font-size:7.8pt; background:var(--navy-deep); color:#DCE6FF;
+    padding:3mm 3.5mm; border-radius:4px; overflow:hidden; white-space:pre-wrap; margin:0 0 4mm;
+    page-break-inside:avoid; line-height:1.45; }
+  pre .c{ color:#7F92BF; }
+
+  .footnote{ font-size:7.8pt; color:var(--muted); border-top:1px solid var(--line); padding-top:2mm; margin-top:4mm; }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <div class="cover-mark">
+    <div class="cover-apex"></div>
+    <div class="cover-brand">LoadKaro</div>
+  </div>
+  <div class="cover-kicker">Platform Discovery Document</div>
+  <h1>Technology Stack &amp;<br>System Interconnection</h1>
+  <div class="cover-sub">
+    A complete technical discovery of the LoadKaro freight marketplace — every runtime surface,
+    the libraries each one is built from, and the exact contracts that bind them to a single
+    Supabase backend.
+  </div>
+  <div class="cover-meta">
+    <div><span>Document date</span><strong>11 August 2026</strong></div>
+    <div><span>Repository</span><strong>mobile App (monorepo)</strong></div>
+    <div><span>Revision</span><strong>1.0</strong></div>
+  </div>
+</div>
+
+<!-- ============ TOC ============ -->
+<section>
+  <h2><span class="num">00</span>Contents</h2>
+  <div class="toc">
+    <a href="#s1"><b>01</b> Platform at a Glance</a>
+    <a href="#s2"><b>02</b> Surface Inventory</a>
+    <a href="#s3"><b>03</b> Technology Stack — Full Inventory</a>
+    <a href="#s4"><b>04</b> System Topology</a>
+    <a href="#s5"><b>05</b> Connection Contracts</a>
+    <a href="#s6"><b>06</b> Identity &amp; Authentication</a>
+    <a href="#s7"><b>07</b> Data Model</a>
+    <a href="#s8"><b>08</b> Core Data Flows</a>
+    <a href="#s9"><b>09</b> Dashboard API Surface</a>
+    <a href="#s10"><b>10</b> Security &amp; Authorization</a>
+    <a href="#s11"><b>11</b> Storage Subsystem</a>
+    <a href="#s12"><b>12</b> Configuration &amp; Environments</a>
+    <a href="#s13"><b>13</b> Build, Release &amp; Deployment</a>
+    <a href="#s14"><b>14</b> Repository Layout</a>
+    <a href="#s15"><b>15</b> Architectural Observations</a>
+    <a href="#s16"><b>16</b> Sources &amp; Verification</a>
+  </div>
+
+  <h3>How to read this document</h3>
+  <p>
+    Sections 1–4 establish <em>what exists</em>. Sections 5–11 establish <em>how the pieces talk to
+    each other</em> — the wire-level contracts, keys, and trust boundaries. Sections 12–14 cover
+    operational reality (config, build, repo). Section 15 records architectural observations found
+    during discovery; section 16 states exactly which facts were verified against live code versus
+    inherited from in-repo documentation.
+  </p>
+
+  <div class="note">
+    <b>Scope note</b>
+    This is a discovery document, not a design proposal. It describes the platform as it exists in
+    the repository on the document date. Where in-repo documentation could not be re-verified
+    against a live system, that is called out explicitly rather than presented as fact.
+  </div>
+</section>
+
+<!-- ============ 1 ============ -->
+<section class="sec" id="s1">
+  <h2><span class="num">01</span>Platform at a Glance</h2>
+
+  <p>
+    LoadKaro is a <strong>two-sided freight marketplace for the Indian road-logistics market</strong>.
+    Shippers post loads that need moving; truck owners post the availability of their vehicles.
+    The platform surfaces each side to the other, records expressions of interest, and hands off to
+    a phone call for the actual negotiation. A moderation layer verifies the identity of users and
+    the documentation of vehicles.
+  </p>
+
+  <div class="kv">
+    <div class="cell"><span>Business model</span><strong>Marketplace / discovery — not a 3PL</strong></div>
+    <div class="cell"><span>Matching mechanism</span><strong>Browse &rarr; call (<code>tel:</code>) + interest record</strong></div>
+    <div class="cell"><span>Runtime surfaces</span><strong>3 (mobile, dashboard, backend)</strong></div>
+    <div class="cell"><span>Backend</span><strong>Single Supabase project</strong></div>
+    <div class="cell"><span>Primary auth</span><strong>Phone OTP (mobile) · Email+password (staff)</strong></div>
+    <div class="cell"><span>Application tables</span><strong>11 in <code>public</code> schema</strong></div>
+    <div class="cell"><span>User roles</span><strong>5 (<code>shipper</code>, <code>truck_owner</code>, <code>broker</code>, <code>moderator</code>, <code>admin</code>)</strong></div>
+    <div class="cell"><span>Languages shipped</span><strong>4 (EN, हिन्दी, ಕನ್ನಡ, తెలుగు)</strong></div>
+  </div>
+
+  <h3>The five defining architectural decisions</h3>
+  <table>
+    <thead><tr><th style="width:26%">Decision</th><th style="width:38%">What it means</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Single shared backend</strong></td>
+        <td>Both client applications point at one Supabase project — one Postgres database, one auth
+            provider, one storage bucket.</td>
+        <td>No service-to-service API layer exists between the apps. The database schema <em>is</em>
+            the integration contract.</td>
+      </tr>
+      <tr>
+        <td><strong>Two different trust postures</strong></td>
+        <td>Mobile uses the <code>anon</code> key and is fully governed by Row Level Security.
+            The dashboard uses the <code>service_role</code> key on server-only routes and bypasses RLS
+            entirely.</td>
+        <td>Mobile security lives in the database; dashboard security lives in application code.
+            Two separate enforcement systems must stay in agreement.</td>
+      </tr>
+      <tr>
+        <td><strong>Phone-first identity</strong></td>
+        <td>Marketplace users authenticate only by SMS OTP. Email/password is reserved for staff.</td>
+        <td>Removes password friction for the target user, but couples user acquisition to SMS
+            deliverability and Indian DLT registration.</td>
+      </tr>
+      <tr>
+        <td><strong>No realtime, no push</strong></td>
+        <td>All discovery is pull-based: the user opens a list screen and it queries. No WebSocket
+            subscriptions, no push notifications.</td>
+        <td>Simple and cheap. Freshness depends on the user re-opening a screen; there is no
+            server-initiated re-engagement channel.</td>
+      </tr>
+      <tr>
+        <td><strong>Call-based matching</strong></td>
+        <td>The platform does not broker, price, or escrow. It opens a <code>tel:</code> link and writes
+            an <code>interests</code> row.</td>
+        <td>Minimal liability and regulatory surface; the <code>interests</code> table is the only
+            telemetry available for measuring marketplace liquidity.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Value chain in one line</h3>
+  <div class="diagram">
+    <div class="flow">
+      <span class="lbl">Shipper posts load</span><span class="arrow">&rarr;</span>
+      <span class="lbl">Truck owner browses</span><span class="arrow">&rarr;</span>
+      <span class="lbl">Interest recorded</span><span class="arrow">&rarr;</span>
+      <span class="lbl">Phone call</span><span class="arrow">&rarr;</span>
+      <span class="lbl">Deal off-platform</span>
+    </div>
+    <div class="flow">
+      <span class="lbl">Truck owner posts availability</span><span class="arrow">&rarr;</span>
+      <span class="lbl">Shipper browses</span><span class="arrow">&rarr;</span>
+      <span class="lbl">Interest recorded</span><span class="arrow">&rarr;</span>
+      <span class="lbl">Phone call</span>
+    </div>
+    <div class="flow">
+      <span class="lbl">Either side uploads KYC / RC</span><span class="arrow">&rarr;</span>
+      <span class="lbl">Moderator reviews in dashboard</span><span class="arrow">&rarr;</span>
+      <span class="lbl">verified / rejected</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section class="sec" id="s2">
+  <h2><span class="num">02</span>Surface Inventory</h2>
+
+  <p>The platform has exactly three runtime surfaces. Everything else is a library, a config file,
+     or a build artifact.</p>
+
+  <table>
+    <thead><tr>
+      <th style="width:16%">Surface</th><th style="width:16%">Runtime</th><th style="width:20%">Deploy target</th>
+      <th style="width:20%">Audience</th><th>Purpose</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>LoadKaro mobile</strong><br><code>LoadKaro/</code></td>
+        <td>React Native 0.81.5 on Expo SDK 54, Hermes engine</td>
+        <td>Android APK / AAB via EAS Build (package <code>in.loadkaro.app</code>); iOS target configured but Android-first</td>
+        <td>Shippers, truck owners, brokers</td>
+        <td>The marketplace itself — post, browse, call, express interest, upload verification documents</td>
+      </tr>
+      <tr>
+        <td><strong>Admin dashboard</strong><br><code>admin-dashboard/</code></td>
+        <td>Next.js 16 App Router on Node, React 19</td>
+        <td>Node server (<code>next build</code> &rarr; <code>next start</code>)</td>
+        <td>Internal admins and moderators</td>
+        <td>Back-office — verification review, record CRUD, KPIs, lead tracking, audit trail</td>
+      </tr>
+      <tr>
+        <td><strong>Supabase backend</strong><br>project <code>ffbbujudebmtbuyssnsn</code></td>
+        <td>Postgres 17.6 + GoTrue auth + Storage, region <code>ap-south-1</code> (Mumbai)</td>
+        <td>Supabase managed cloud</td>
+        <td>Both applications</td>
+        <td>Persistence, identity, file storage, and — for mobile — authorization enforcement via RLS</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <b>No fourth tier</b>
+    There is no custom backend service, no queue, no cron worker, and no Supabase Edge Function in
+    the deployed path. Business logic lives either in the client, in Next.js route handlers, or as
+    Postgres constraints and RLS policies. This keeps the operational footprint to two deployables.
+  </div>
+
+  <h3>2.1 Mobile application — screen inventory</h3>
+  <p>
+    The mobile app carries two generations of UI simultaneously. A legacy shared stack serves
+    brokers and any unmigrated flow; two dedicated, redesigned navigators serve the two primary
+    revenue roles.
+  </p>
+
+  <table>
+    <thead><tr><th style="width:22%">Navigator</th><th style="width:20%">Entry</th><th>Screens</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Auth stack</strong></td>
+        <td>Unauthenticated</td>
+        <td><code>Landing</code>, <code>Register</code>, <code>SignIn</code>, <code>OTP</code></td>
+      </tr>
+      <tr>
+        <td><strong>ShipperNavigator</strong><br><span class="pill p-org">redesigned</span></td>
+        <td>role = <code>shipper</code></td>
+        <td>Four-tab shell — <code>ShipperHome</code>, <code>ShipperMyLoads</code>, <code>ShipperTrucks</code>,
+            <code>ShipperProfile</code> — plus a pushed <code>ShipperPostLoad</code> screen</td>
+      </tr>
+      <tr>
+        <td><strong>TruckOwnerNavigator</strong><br><span class="pill p-org">redesigned</span></td>
+        <td>role = <code>truck_owner</code></td>
+        <td>Four-tab shell — <code>TruckOwnerHome</code>, <code>TruckOwnerAvailability</code>,
+            <code>TruckOwnerLoads</code>, <code>TruckOwnerProfile</code> — plus pushed
+            <code>PostAvailability</code>, <code>Trucks</code>, <code>AddTruck</code>, <code>EditTruck</code></td>
+      </tr>
+      <tr>
+        <td><strong>Legacy app stack</strong></td>
+        <td>Other roles / fallback</td>
+        <td><code>RoleDashboard</code>, <code>UploadLoad</code>, <code>ViewLoads</code>,
+            <code>ViewAvailabilities</code>, <code>ManageTrucks</code>, <code>AddTruck</code>,
+            <code>EditTruck</code>, <code>CreateAvailability</code>, <code>ManageAvailabilities</code>,
+            <code>FindReturnLoad</code>, <code>Profile</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    Both redesigned navigators render their tab body by conditional mount rather than by a
+    <code>Tab.Navigator</code>, and both share a single <code>ShipperTabBar</code> component — the truck-owner
+    navigator imports the shipper's tab bar directly. Tab state is local component state, so tab
+    selection does not survive a navigator remount.
+  </p>
+
+  <h3>2.2 Dashboard — route inventory</h3>
+  <table>
+    <thead><tr><th style="width:22%">Route group</th><th style="width:12%">Access</th><th>Pages</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>/login</code></td><td>Public</td>
+        <td>Email/password sign-in; role lookup then redirect. Shows dev bypass buttons when enabled.</td>
+      </tr>
+      <tr>
+        <td><code>/admin/*</code></td><td>role = <code>admin</code></td>
+        <td><code>dashboard</code>, <code>loads</code>, <code>availabilities</code>, <code>alerts</code>,
+            <code>users</code> + <code>users/[id]</code>, <code>shippers</code>, <code>truck-owners</code>,
+            <code>trucks</code> + <code>trucks/[id]</code>, <code>locations</code>,
+            <code>verifications</code>, <code>add-moderator</code>, <code>activity-log</code></td>
+      </tr>
+      <tr>
+        <td><code>/moderator/*</code></td><td>role = <code>moderator</code></td>
+        <td><code>dashboard</code>, <code>loads</code>, <code>availabilities</code>, <code>users</code> +
+            <code>users/[id]</code>, <code>shippers</code>, <code>truck-owners</code>, <code>trucks</code> +
+            <code>trucks/[id]</code>, <code>verifications</code> — no alerts, no leads, no settings</td>
+      </tr>
+      <tr>
+        <td><code>/api/admin/*</code></td><td>admin or moderator</td>
+        <td>9 route handlers — see section 09</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 3 ============ -->
+<section class="sec" id="s3">
+  <h2><span class="num">03</span>Technology Stack — Full Inventory</h2>
+
+  <h3>3.1 Mobile application</h3>
+  <table>
+    <thead><tr><th style="width:20%">Layer</th><th style="width:32%">Package</th><th style="width:12%">Version</th><th>Role in the system</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3"><strong>Runtime</strong></td>
+        <td><code>expo</code></td><td>~54.0.35</td><td>Build toolchain, native module management, OTA-capable runtime</td></tr>
+      <tr><td><code>react-native</code></td><td>0.81.5</td><td>Native UI runtime; New Architecture explicitly disabled</td></tr>
+      <tr><td><code>react</code></td><td>19.1.0</td><td>Component model</td></tr>
+      <tr><td rowspan="2"><strong>Navigation</strong></td>
+        <td><code>@react-navigation/native</code></td><td>^7.1.34</td><td>Navigation container and state</td></tr>
+      <tr><td><code>@react-navigation/native-stack</code></td><td>^7.14.6</td><td>Native stack navigators (auth, shipper, truck owner, legacy)</td></tr>
+      <tr><td rowspan="3"><strong>Native deps</strong></td>
+        <td><code>react-native-screens</code></td><td>~4.16.0</td><td>Native screen primitives backing the stacks</td></tr>
+      <tr><td><code>react-native-safe-area-context</code></td><td>~5.6.2</td><td>Notch/inset handling for the custom tab bar</td></tr>
+      <tr><td><code>react-native-gesture-handler</code></td><td>~2.28.0</td><td>Gesture layer required by navigation</td></tr>
+      <tr><td><strong>State</strong></td>
+        <td><code>zustand</code></td><td>^5.0.12</td><td>Single global auth store — session, public user profile, resolved dashboard route</td></tr>
+      <tr><td rowspan="2"><strong>Backend client</strong></td>
+        <td><code>@supabase/supabase-js</code></td><td>^2.99.3</td><td>PostgREST, Auth, and Storage client — the only network layer in the app</td></tr>
+      <tr><td><code>react-native-url-polyfill</code></td><td>^3.0.0</td><td>URL/URLSearchParams polyfill required by supabase-js on Hermes</td></tr>
+      <tr><td><strong>Persistence</strong></td>
+        <td><code>@react-native-async-storage/async-storage</code></td><td>2.2.0</td><td>Session storage adapter for Supabase Auth; also backs local search history</td></tr>
+      <tr><td rowspan="4"><strong>Device / UI</strong></td>
+        <td><code>@expo/vector-icons</code></td><td>^15.0.3</td><td>Ionicons + MaterialCommunityIcons used across tab bars and cards</td></tr>
+      <tr><td><code>expo-font</code></td><td>~14.0.12</td><td>Custom font loading</td></tr>
+      <tr><td><code>expo-document-picker</code></td><td>~14.0.8</td><td>Selecting KYC / vehicle documents for upload</td></tr>
+      <tr><td><code>@react-native-community/datetimepicker</code></td><td>8.4.4</td><td>Loading dates and availability windows</td></tr>
+      <tr><td><strong>Connectivity</strong></td>
+        <td><code>@react-native-community/netinfo</code></td><td>11.4.1</td><td>Drives the offline banner and network-status hook</td></tr>
+      <tr><td><strong>Tooling</strong></td>
+        <td><code>typescript</code> / <code>@types/react</code></td><td>^5.9.3 / ~19.1.10</td><td>Types for the TS files (store, config, utils); most screens remain <code>.js</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <b>Notable absences</b>
+    No data-fetching cache (React Query / SWR), no navigation-level state persistence, no
+    error-reporting SDK (Sentry or equivalent), no analytics SDK, and no push-notification module.
+    Data fetching is hand-rolled per screen against the Supabase client; observability is limited
+    to a local <code>lib/logger.js</code> and an <code>ErrorBoundary</code> component.
+  </div>
+
+  <h3>3.2 Admin dashboard</h3>
+  <table>
+    <thead><tr><th style="width:20%">Layer</th><th style="width:32%">Package</th><th style="width:12%">Version</th><th>Role in the system</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3"><strong>Framework</strong></td>
+        <td><code>next</code></td><td>16.2.2</td><td>App Router — server components, route handlers, edge middleware</td></tr>
+      <tr><td><code>react</code> / <code>react-dom</code></td><td>19.2.4</td><td>UI runtime</td></tr>
+      <tr><td><code>typescript</code></td><td>^5</td><td>Strict typing across the dashboard — it is fully TypeScript</td></tr>
+      <tr><td rowspan="2"><strong>Backend client</strong></td>
+        <td><code>@supabase/supabase-js</code></td><td>^2.101.1</td><td>Service-role client on the server; anon client in the browser for login</td></tr>
+      <tr><td><code>@supabase/ssr</code></td><td>^0.10.0</td><td>Cookie-based session bridging for server components and middleware</td></tr>
+      <tr><td rowspan="6"><strong>UI system</strong></td>
+        <td><code>tailwindcss</code> + <code>@tailwindcss/postcss</code></td><td>^4</td><td>Utility styling; the design-token layer for the "LoadKaro Dispatch" theme</td></tr>
+      <tr><td><code>shadcn</code></td><td>^4.1.2</td><td>Component generator — 11 primitives vendored into <code>components/ui</code></td></tr>
+      <tr><td><code>@base-ui/react</code></td><td>^1.3.0</td><td>Unstyled accessible primitives beneath the shadcn layer</td></tr>
+      <tr><td><code>lucide-react</code></td><td>^1.7.0</td><td>Icon set</td></tr>
+      <tr><td><code>class-variance-authority</code>, <code>clsx</code>, <code>tailwind-merge</code></td><td>—</td><td>Variant and class-composition helpers used by every UI primitive</td></tr>
+      <tr><td><code>tw-animate-css</code></td><td>^1.4.0</td><td>Animation utilities (KPI counters, transitions)</td></tr>
+      <tr><td><strong>Data grid</strong></td>
+        <td><code>@tanstack/react-table</code></td><td>^8.21.3</td><td>Headless table engine powering <code>CommonDataTable</code> — every ops screen</td></tr>
+      <tr><td><strong>Linting</strong></td>
+        <td><code>eslint</code> + <code>eslint-config-next</code></td><td>^9 / 16.2.2</td><td>Static checks</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.3 Backend</h3>
+  <table>
+    <thead><tr><th style="width:24%">Component</th><th style="width:20%">Technology</th><th>Configuration</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Database</strong></td><td>PostgreSQL 17.6.1</td>
+        <td>11 application tables in <code>public</code>; 10 custom enum types; ~41 indexes; RLS enabled on every table</td></tr>
+      <tr><td><strong>API layer</strong></td><td>PostgREST (Supabase auto-API)</td>
+        <td>Both clients speak PostgREST directly. Embedded joins are used heavily, e.g.
+            <code>users!trucks_owner_id_fkey(name)</code></td></tr>
+      <tr><td><strong>Authentication</strong></td><td>Supabase Auth (GoTrue)</td>
+        <td>Phone/SMS OTP for marketplace users; email + password for dashboard staff. Both write into
+            the same <code>auth.users</code> table</td></tr>
+      <tr><td><strong>Storage</strong></td><td>Supabase Storage</td>
+        <td>One private bucket, <code>verification-docs</code>, keyed by
+            <code>{entityType}/{entityId}/{submissionId}/{docKey}/{file}</code></td></tr>
+      <tr><td><strong>Authorization</strong></td><td>Postgres RLS</td>
+        <td>~31 policies on <code>public</code> tables plus storage policies. This is the sole security
+            boundary for the mobile app</td></tr>
+      <tr><td><strong>Region</strong></td><td><code>ap-south-1</code> (Mumbai)</td>
+        <td>Co-located with the Indian user base</td></tr>
+      <tr><td><strong>Schema management</strong></td><td class="p-warn">Manual</td>
+        <td>The project does <strong>not</strong> use Supabase CLI migrations. Schema and policy changes are
+            applied directly, with ad-hoc SQL backups (<code>rls_backup_*.sql</code>) kept in the repo root</td></tr>
+    </tbody>
+  </table>
+
+  <h3>3.4 Cross-cutting</h3>
+  <table>
+    <thead><tr><th style="width:24%">Concern</th><th>Implementation</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Monorepo</strong></td>
+        <td>npm workspaces at the repository root. One <code>npm install</code>; per-app scripts via
+            <code>npm --workspace &lt;app&gt; run &lt;script&gt;</code></td></tr>
+      <tr><td><strong>Internationalization</strong></td>
+        <td>Hand-rolled — a React context (<code>i18n/LanguageContext.js</code>) over four flat dictionaries
+            (<code>en</code>, <code>hi</code>, <code>kn</code>, <code>te</code>), roughly 355 keys each. No i18n library, no
+            pluralization engine, no lazy loading</td></tr>
+      <tr><td><strong>Design tokens</strong></td>
+        <td>Mobile: <code>theme/theme.js</code> — navy <code>#0C2356</code> + orange <code>#FB4B0A</code> sampled from the
+            logo. Dashboard: the parallel "LoadKaro Dispatch" token set with an azure brand and dark mode</td></tr>
+      <tr><td><strong>Network resilience</strong></td>
+        <td>Mobile wraps every Supabase request in a 30-second <code>AbortController</code> timeout, because
+            React Native's <code>fetch</code> has no default read timeout and a stalled 2G socket would otherwise
+            hang a screen indefinitely</td></tr>
+      <tr><td><strong>Audit</strong></td>
+        <td>Every dashboard mutation writes an <code>audit_log</code> row, fire-and-forget</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 4 ============ -->
+<section class="sec" id="s4">
+  <h2><span class="num">04</span>System Topology</h2>
+
+  <p>
+    The following is the complete set of runtime connections in the platform. Every arrow is a real
+    network path; there are no others.
+  </p>
+
+  <div class="diagram">
+    <div class="tier">
+      <div class="tier-label">Client tier</div>
+      <div class="row">
+        <div class="box">
+          <h5>LoadKaro Mobile</h5>
+          <span class="tech">React Native 0.81 · Expo SDK 54 · Hermes</span>
+          <ul>
+            <li>Shipper navigator (4 tabs)</li>
+            <li>Truck-owner navigator (4 tabs)</li>
+            <li>Legacy stack (broker / fallback)</li>
+            <li>Zustand auth store · AsyncStorage session</li>
+          </ul>
+        </div>
+        <div class="box">
+          <h5>Admin Dashboard — Browser</h5>
+          <span class="tech">Next.js 16 client components · React 19</span>
+          <ul>
+            <li>Login page (anon client)</li>
+            <li>CommonDataTable (TanStack)</li>
+            <li>Verification review modal</li>
+            <li>Global search · KPI grid</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow">
+      <span class="lbl">anon key · JWT · RLS enforced</span><span class="arrow">&darr;</span>
+      <span class="lbl">session cookie</span><span class="arrow">&darr;</span>
+      <span class="lbl">fetch /api/admin/*</span>
+    </div>
+
+    <div class="tier">
+      <div class="tier-label">Server tier (dashboard only)</div>
+      <div class="row">
+        <div class="box ghost" style="flex:.9">
+          <h5>Edge Middleware</h5>
+          <span class="tech">middleware.ts</span>
+          <ul>
+            <li>Guards <code>/admin/*</code>, <code>/moderator/*</code></li>
+            <li>Guards <code>/login</code>, <code>/api/admin/*</code></li>
+            <li>Reads session from cookies</li>
+          </ul>
+        </div>
+        <div class="box accent" style="flex:1.1">
+          <h5>Route Handlers — /api/admin/*</h5>
+          <span class="tech">Next.js server runtime · service_role client</span>
+          <ul>
+            <li><code>requireDashboardAccess()</code> on every route</li>
+            <li>Table allowlist + per-role patch allowlist</li>
+            <li>Writes <code>audit_log</code> on every mutation</li>
+            <li>Mints 300-second signed storage URLs</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow">
+      <span class="lbl">service_role key · RLS BYPASSED</span><span class="arrow">&darr;</span>
+    </div>
+
+    <div class="tier">
+      <div class="tier-label">Backend tier — one Supabase project (ap-south-1)</div>
+      <div class="row">
+        <div class="box accent">
+          <h5>Supabase Auth</h5>
+          <span class="tech">GoTrue</span>
+          <ul>
+            <li>Phone OTP &rarr; mobile users</li>
+            <li>Email + password &rarr; staff</li>
+            <li>Owns <code>auth.users</code></li>
+          </ul>
+        </div>
+        <div class="box accent">
+          <h5>PostgreSQL 17.6 + RLS</h5>
+          <span class="tech">PostgREST auto-API</span>
+          <ul>
+            <li>11 tables · 10 enums · 20 FKs</li>
+            <li>~31 RLS policies</li>
+            <li><code>public.users.id</code> = <code>auth.users.id</code></li>
+          </ul>
+        </div>
+        <div class="box accent">
+          <h5>Supabase Storage</h5>
+          <span class="tech">private bucket</span>
+          <ul>
+            <li><code>verification-docs</code></li>
+            <li>Path-scoped upload policies</li>
+            <li>Signed-URL reads only</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>4.1 Connection matrix</h3>
+  <table>
+    <thead><tr>
+      <th style="width:17%">From</th><th style="width:15%">To</th><th style="width:16%">Protocol</th>
+      <th style="width:16%">Credential</th><th>Governed by</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>Mobile app</td><td>Supabase Auth</td><td>HTTPS / GoTrue REST</td><td>anon key</td>
+          <td>Auth provider rules; OTP rate limits</td></tr>
+      <tr><td>Mobile app</td><td>Postgres</td><td>HTTPS / PostgREST</td><td>anon key + user JWT</td>
+          <td><span class="pill p-ok">RLS</span> — the only boundary</td></tr>
+      <tr><td>Mobile app</td><td>Storage</td><td>HTTPS / Storage REST</td><td>anon key + user JWT</td>
+          <td>Storage RLS policies (path-scoped)</td></tr>
+      <tr><td>Dashboard browser</td><td>Supabase Auth</td><td>HTTPS / GoTrue REST</td><td>anon key</td>
+          <td>Password sign-in; role checked immediately after</td></tr>
+      <tr><td>Dashboard browser</td><td>Next.js server</td><td>HTTPS / <code>fetch</code></td><td>Session cookie</td>
+          <td>Middleware + <code>requireDashboardAccess()</code></td></tr>
+      <tr><td>Next.js server</td><td>Postgres</td><td>HTTPS / PostgREST</td><td><span class="pill p-dang">service_role</span></td>
+          <td><span class="pill p-warn">App code only</span> — RLS bypassed</td></tr>
+      <tr><td>Next.js server</td><td>Storage</td><td>HTTPS / Storage REST</td><td>service_role</td>
+          <td>App-level bucket allowlist; 300 s signed URLs</td></tr>
+      <tr><td>Mobile app</td><td>Counterparty phone</td><td><code>tel:</code> intent</td><td>—</td>
+          <td>Device dialer — leaves the platform entirely</td></tr>
+    </tbody>
+  </table>
+
+  <div class="danger">
+    <b>The critical asymmetry</b>
+    Mobile is defended by the database; the dashboard is defended by TypeScript. If an
+    <code>/api/admin/*</code> handler ever forgets <code>requireDashboardAccess()</code> or the patch allowlist,
+    there is no second line of defence — the <code>service_role</code> key has unrestricted access to every
+    row in the database. Any new dashboard route must be treated as a security-critical change.
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section class="sec" id="s5">
+  <h2><span class="num">05</span>Connection Contracts</h2>
+
+  <p>
+    "How it's connected" is best understood as four distinct contracts. Each has its own credential,
+    its own enforcement point, and its own failure mode.
+  </p>
+
+  <h3>5.1 Contract A — Mobile &harr; Supabase (direct, RLS-governed)</h3>
+  <table>
+    <thead><tr><th style="width:24%">Property</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>Client construction</td><td>A single module-level client in <code>LoadKaro/lib/supabase.js</code>. There is
+          exactly one client instance in the app; every screen imports it.</td></tr>
+      <tr><td>Credentials</td><td><code>EXPO_PUBLIC_SUPABASE_URL</code> + <code>EXPO_PUBLIC_SUPABASE_ANON_KEY</code>
+          (falling back to the legacy <code>EXPO_PUBLIC_SUPABASE_KEY</code>). Both are compiled into the bundle
+          and are public by design.</td></tr>
+      <tr><td>Session handling</td><td><code>storage: AsyncStorage</code>, <code>autoRefreshToken: true</code>,
+          <code>persistSession: true</code>, <code>detectSessionInUrl: false</code>. Sessions survive app restarts.</td></tr>
+      <tr><td>Transport hardening</td><td>A custom <code>fetch</code> wrapper aborts any request after 30 seconds
+          unless the caller supplied its own signal. This exists specifically for users on stalled 2G
+          connections, where the socket stays open but no data flows.</td></tr>
+      <tr><td>Degraded mode</td><td>If env vars are missing, <code>isSupabaseConfigured</code> is <code>false</code> and a
+          placeholder client is constructed against <code>https://placeholder.supabase.co</code> so the app
+          fails at the request level rather than crashing at import.</td></tr>
+      <tr><td>Query style</td><td>Direct PostgREST calls with embedded joins and <code>.range()</code> pagination at
+          <code>PAGE_SIZE = 20</code>. No client-side cache — every screen re-queries on focus.</td></tr>
+      <tr><td>Failure mode</td><td>An RLS mismatch is <em>silent</em> on reads: forbidden rows are simply absent
+          from the result set, so a policy regression reads as "no data" rather than an error.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.2 Contract B — Dashboard browser &harr; Next.js server</h3>
+  <table>
+    <thead><tr><th style="width:24%">Property</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>Transport</td><td>Ordinary <code>fetch</code> from client components to same-origin
+          <code>/api/admin/*</code> route handlers.</td></tr>
+      <tr><td>Credential</td><td>The Supabase session cookie, written at login by <code>@supabase/ssr</code> and read
+          server-side by <code>createSupabaseServerAuthClient()</code>.</td></tr>
+      <tr><td>First gate</td><td><code>middleware.ts</code> matches <code>/admin/:path*</code>, <code>/moderator/:path*</code>,
+          <code>/login</code>, and <code>/api/admin/:path*</code>; unauthenticated or wrong-role page requests are
+          redirected to <code>/login?next=…</code>.</td></tr>
+      <tr><td>Second gate</td><td>Every route handler independently calls <code>requireDashboardAccess()</code>, which
+          re-reads the session, re-queries <code>public.users.role</code>, and accepts only <code>admin</code> or
+          <code>moderator</code>. Middleware alone is never trusted.</td></tr>
+      <tr><td>Third gate</td><td><code>hasServiceRoleKey()</code> — if the key is absent the route returns <strong>503</strong>
+          with setup instructions rather than failing obscurely.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.3 Contract C — Next.js server &harr; Supabase (service role)</h3>
+  <table>
+    <thead><tr><th style="width:24%">Property</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>Client construction</td><td><code>createServiceRoleClient()</code> in
+          <code>src/lib/supabase/service-role.ts</code>, with <code>persistSession: false</code> and
+          <code>autoRefreshToken: false</code>.</td></tr>
+      <tr><td>Credential</td><td><code>SUPABASE_SERVICE_ROLE_KEY</code> — server-scoped only, never prefixed with
+          <code>NEXT_PUBLIC_</code>, and therefore never shipped to the browser.</td></tr>
+      <tr><td>Privilege</td><td>Full read/write on every table. RLS does not apply.</td></tr>
+      <tr><td>Compensating controls</td><td>(1) table allowlists per HTTP verb; (2) <code>admin_alerts</code> restricted
+          to admin and never deletable; (3) <code>filterPatchByAllowlist()</code> reduces every PATCH body to the
+          columns that role may touch on that table; (4) <code>phone</code> and <code>email</code> stripped from every
+          patch unconditionally; (5) <code>select</code> parameter validated against
+          <code>/^[\w\-,.*! ():]+$/</code> and capped at 8 000 characters; (6) an <code>audit_log</code> row per
+          mutation.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.4 Contract D — The shared schema (the real integration point)</h3>
+  <p>
+    The two applications never call each other. Their only coupling is the database schema — which
+    makes the schema an <strong>undeclared, unversioned API contract</strong> between them.
+  </p>
+  <table>
+    <thead><tr><th style="width:24%">Shared object</th><th style="width:32%">Mobile depends on it for</th><th>Dashboard depends on it for</th></tr></thead>
+    <tbody>
+      <tr><td><code>users.role</code></td><td>Routing the user to a navigator after OTP</td><td>Authorizing dashboard access at both gates</td></tr>
+      <tr><td><code>users.verification_status</code></td><td>Rendering the verification badge and gating flows</td><td>The write target of every verification decision</td></tr>
+      <tr><td><code>trucks.verification_status</code></td><td>Blocking edits once a truck is <code>pending</code> or <code>verified</code></td><td>The write target of truck verification decisions</td></tr>
+      <tr><td><code>loads</code> / <code>availabilities</code>.<code>status</code></td><td>Filtering market listings</td><td>Ops close/cancel actions</td></tr>
+      <tr><td><code>interests</code></td><td>Written when a user taps "Show Interest"</td><td>Read as the lead pipeline; <code>status</code> advanced by staff</td></tr>
+      <tr><td><code>verification_submissions</code> / <code>_documents</code></td><td>Written on upload; read in "My Documents"</td><td>Read for review; updated with the decision</td></tr>
+      <tr><td>All 10 enum types</td><td>Hardcoded in <code>config/*.ts</code> label maps</td><td>Mirrored in <code>src/lib/schema/enums.ts</code></td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    <b>Contract risk</b>
+    Enum values are duplicated in three places — Postgres, the mobile label configs, and the
+    dashboard's <code>enums.ts</code>. Because there are no migration files and no generated types wired
+    into either app, adding an enum value in the database will not produce a compile error anywhere;
+    it will surface as an unlabelled value in the UI. This is the single highest-friction point in
+    the platform's connective tissue.
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section class="sec" id="s6">
+  <h2><span class="num">06</span>Identity &amp; Authentication</h2>
+
+  <p>
+    Both applications authenticate against the same <code>auth.users</code> table, but through different
+    methods and with different post-login resolution.
+  </p>
+
+  <h3>6.1 Mobile — phone OTP</h3>
+  <p>
+    Two modes share one OTP screen. <strong>Register</strong> collects name, phone, and role up front and
+    passes them as auth metadata; <strong>Sign in</strong> collects only the phone number.
+  </p>
+
+  <ol class="steps">
+    <li>The screen normalizes the number via <code>formatPhoneOtpIndia()</code> — strips non-digits, accepts
+        10-digit, <code>91</code>-prefixed 12-digit, or <code>0</code>-prefixed 11-digit input, validates the national
+        part against <code>/^[6-9]\d{9}$/</code>, and emits E.164 <code>+91XXXXXXXXXX</code>.</li>
+    <li><code>supabase.auth.signInWithOtp({ phone, … })</code> triggers the SMS.</li>
+    <li>The user enters six digits; <code>verifyOtp({ phone, token, type: 'sms' })</code> returns a session.</li>
+    <li><code>syncUserAfterOtp()</code> reconciles <code>auth.users</code> with <code>public.users</code>: on register, if no
+        profile row exists it inserts one (<code>id</code>, <code>name</code>, <code>phone</code>, <code>role</code>); it then
+        selects the full profile.</li>
+    <li><code>resolveDashboardRoute()</code> maps <code>role</code> to a navigator via <code>config/roleRoutes.ts</code>.</li>
+    <li>The Zustand store receives <code>{ user, session, dashboardRoute }</code>, and <code>RootNavigator</code>
+        — keyed on <code>dashboardRoute</code> — remounts into the correct experience.</li>
+  </ol>
+
+  <h4>Session lifecycle</h4>
+  <ul>
+    <li><code>initializeAuth()</code> runs on mount: <code>getSession()</code>, fetch the public profile if a session
+        exists, set <code>isReady</code>, then install an <code>onAuthStateChange</code> listener.</li>
+    <li>The listener debounces its profile fetch by <strong>400 ms</strong> to avoid racing the profile
+        <code>INSERT</code> that registration performs moments earlier.</li>
+    <li>If a profile fetch fails but a user is already in state, the existing user is preserved —
+        transient network errors do not log the user out.</li>
+    <li><code>signOut()</code> clears Supabase state, clears the store, and resets the route to the default.</li>
+  </ul>
+
+  <div class="warn">
+    <b>Operational dependency</b>
+    Mobile sign-up and sign-in are entirely dependent on SMS delivery. In the Indian market this
+    means DLT registration of the sender entity, header, and templates. No fallback authentication
+    method (email, magic link, WhatsApp) exists in the app, so an SMS outage is a total outage of
+    new-user acquisition and of any user without a live session.
+  </div>
+
+  <h3>6.2 Dashboard — email and password</h3>
+  <ol class="steps">
+    <li><code>signInWithPassword({ email, password })</code> against the browser anon client.</li>
+    <li>Immediately after, the page reads <code>role</code> from <code>public.users</code> for that user id.</li>
+    <li><code>admin</code> &rarr; <code>/admin/dashboard</code>; <code>moderator</code> &rarr; <code>/moderator/dashboard</code>;
+        anything else &rarr; forced <code>signOut()</code> plus a "not authorized" message. A marketplace user
+        who somehow knows a dashboard URL cannot hold a session there.</li>
+    <li>Every subsequent request is re-checked by middleware and again by
+        <code>requireDashboardAccess()</code> inside each route handler.</li>
+  </ol>
+
+  <h4>Moderator provisioning</h4>
+  <p>
+    Moderators are created by an admin through a two-step OTP flow rather than by password
+    invitation: <code>POST /api/admin/moderator/send-otp</code> (validates the phone, rejects duplicates with
+    <strong>409</strong>, sends an OTP) followed by <code>POST /api/admin/moderator/create</code> (verifies the OTP,
+    then either upgrades the existing <code>users</code> row to <code>moderator</code> or inserts a new row already
+    marked <code>verified</code>). New inserts write a <code>create_moderator</code> audit entry.
+  </p>
+
+  <h3>6.3 Development bypass</h3>
+  <p>
+    For local work without real Supabase Auth users, <code>DASHBOARD_BYPASS_AUTH</code> (server) and
+    <code>NEXT_PUBLIC_DASHBOARD_BYPASS_AUTH</code> (client) short-circuit both gates. The role is read from an
+    <code>lk-bypass-role</code> cookie, defaulting to <code>admin</code>, and <code>requireDashboardAccess()</code> returns
+    <code>{ ok: true, bypass: true, userId: null }</code> — which means audit rows written in bypass mode have a
+    null actor.
+  </p>
+  <div class="danger">
+    <b>Production hazard</b>
+    With bypass enabled, anyone who can reach the dashboard origin has full <code>service_role</code>-backed
+    access to every record. These flags must be absent — not merely false — in every production
+    environment, and should be part of the deployment checklist.
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section class="sec" id="s7">
+  <h2><span class="num">07</span>Data Model</h2>
+
+  <p>Eleven application tables in the <code>public</code> schema, plus Supabase's own <code>auth</code> and
+     <code>storage</code> schemas. RLS is enabled on all eleven.</p>
+
+  <h3>7.1 Table catalogue</h3>
+  <table>
+    <thead><tr><th style="width:19%">Table</th><th style="width:10%">Group</th><th>Purpose and key columns</th></tr></thead>
+    <tbody>
+      <tr><td><code>users</code></td><td>Identity</td>
+        <td>Application profile, 1:1 with <code>auth.users</code> (PK is also the FK, <code>ON DELETE CASCADE</code>).
+            Holds <code>role</code>, <code>verification_status</code>, <code>subscription_type</code>. <code>phone</code> is unique.</td></tr>
+      <tr><td><code>trucks</code></td><td>Supply</td>
+        <td>A vehicle owned by a truck owner. Physical specs (<code>capacity_tons</code>, axle/wheel counts,
+            internal dimensions), <code>permit_type</code>, <code>gps_available</code>, and its own
+            <code>verification_status</code>.</td></tr>
+      <tr><td><code>truck_variants</code></td><td>Reference</td>
+        <td>Lookup of 31 seeded variant names grouped by <code>truck_category_enum</code>.</td></tr>
+      <tr><td><code>availabilities</code></td><td>Supply</td>
+        <td>A truck owner advertising capacity: truck, origin/destination, <code>available_from</code>/<code>_till</code>
+            (CHECK-constrained ordering), <code>expected_rate</code>, live lat/long, and <code>status</code>.</td></tr>
+      <tr><td><code>loads</code></td><td>Demand</td>
+        <td>A shipper's freight: origin/destination (<code>ON DELETE RESTRICT</code>), <code>loading_date</code>,
+            <code>truck_category_required</code>, <code>capacity_required</code>, <code>payment_type</code>,
+            <code>advance_percentage</code>, optional rate, <code>status</code>.</td></tr>
+      <tr><td><code>locations</code></td><td>Reference</td>
+        <td>2 166 pre-seeded Indian cities with state and optional coordinates. Every route field on both
+            sides of the marketplace points here.</td></tr>
+      <tr><td><code>interests</code></td><td>Marketplace</td>
+        <td>The lead record. Points at either a <code>load_id</code> or an <code>availability_id</code>, plus
+            <code>interested_by</code> and <code>contacted_party</code>. <code>status</code> advances
+            <code>interested &rarr; contacted &rarr; matched</code>, or <code>expired</code>.</td></tr>
+      <tr><td><code>verification_submissions</code></td><td>Trust</td>
+        <td>One review request for an entity (<code>entity_type</code> is <code>user</code> or <code>truck</code>). Carries the
+            decision, reviewer, timestamp, and rejection reason.</td></tr>
+      <tr><td><code>verification_documents</code></td><td>Trust</td>
+        <td>One row per uploaded file: <code>doc_key</code>, <code>bucket</code>, <code>path</code>, original filename, MIME
+            type, size. Cascades from its submission.</td></tr>
+      <tr><td><code>admin_alerts</code></td><td>Ops</td>
+        <td>One alert per posted load (<code>load_id</code> is UNIQUE), with <code>is_handled</code>, <code>handled_by</code>,
+            <code>handled_at</code>.</td></tr>
+      <tr><td><code>audit_log</code></td><td>Compliance</td>
+        <td>Append-only record of every dashboard mutation: actor, role, action, entity, and a
+            <code>jsonb</code> details payload.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.2 Relationship map</h3>
+  <pre><span class="c">auth.users</span>
+    └─1:1─&gt; <span class="c">public.users</span>  (id = id, CASCADE)
+                ├─1:N─&gt; trucks            (owner_id, CASCADE)
+                │           └─1:N─&gt; availabilities (truck_id, CASCADE)
+                ├─1:N─&gt; availabilities    (owner_id, CASCADE)
+                ├─1:N─&gt; loads             (posted_by, CASCADE)
+                │           └─1:1─&gt; admin_alerts (load_id UNIQUE, CASCADE)
+                └─0:N─&gt; admin_alerts      (handled_by)
+
+<span class="c">locations</span>
+    ├─&gt; loads.origin_location_id / destination_location_id      (RESTRICT)
+    └─&gt; availabilities.origin_location_id / destination_...     (NO ACTION)
+
+<span class="c">truck_variants</span> ─&gt; trucks.variant_id                          (NO ACTION)
+
+<span class="c">interests</span>  ─&gt; loads.id | availabilities.id  +  auth.users ×2   (NO ACTION)
+
+<span class="c">verification_submissions</span> ─1:N─&gt; verification_documents      (CASCADE)
+         └─&gt; auth.users (submitted_by, reviewed_by)
+
+<span class="c">audit_log</span> ─&gt; auth.users (actor_id)</pre>
+
+  <p>
+    Two deletion behaviours are worth noting. Deleting a user cascades away their trucks, loads, and
+    availabilities — but <strong>not</strong> their <code>interests</code> rows, which reference <code>auth.users</code> with
+    <code>NO ACTION</code>. And <code>loads</code> reference <code>locations</code> with <code>RESTRICT</code>, so a seeded city that has
+    ever been used cannot be deleted.
+  </p>
+
+  <h3>7.3 Enum types</h3>
+  <table>
+    <thead><tr><th style="width:30%">Enum</th><th>Values</th></tr></thead>
+    <tbody>
+      <tr><td><code>user_role_enum</code></td><td><code>truck_owner</code>, <code>broker</code>, <code>shipper</code>, <code>moderator</code>, <code>admin</code></td></tr>
+      <tr><td><code>user_verification_status_enum</code></td><td><code>unverified</code>, <code>verified</code>, <code>rejected</code>, <code>pending</code></td></tr>
+      <tr><td><code>truck_verification_status_enum</code></td><td><code>unverified</code>, <code>verified</code>, <code>rejected</code>, <code>pending</code></td></tr>
+      <tr><td><code>truck_category_enum</code></td><td><code>open</code>, <code>container</code>, <code>lcv</code>, <code>mini_pickup</code>, <code>trailer</code>, <code>tipper</code>, <code>tanker</code>, <code>dumper</code>, <code>bulker</code></td></tr>
+      <tr><td><code>permit_type_enum</code></td><td><code>national_permit</code>, <code>state_permit</code>, <code>all_india_permit</code>, <code>goods_carriage</code>, <code>contract_carriage</code></td></tr>
+      <tr><td><code>truck_availability_status_enum</code></td><td><code>available</code>, <code>closed</code>, <code>cancelled</code></td></tr>
+      <tr><td><code>load_status_enum</code></td><td><code>open</code>, <code>matched</code>, <code>cancelled</code>, <code>closed</code></td></tr>
+      <tr><td><code>payment_type_enum</code></td><td><code>advance</code>, <code>partial_advance</code>, <code>after_delivery</code></td></tr>
+      <tr><td><code>subscription_type_enum</code></td><td><code>free</code>, <code>premium</code>, <code>enterprise</code> <span class="pill p-warn">defined, not monetized</span></td></tr>
+      <tr><td><code>load_rate_visibility_enum</code></td><td><code>visible</code>, <code>hidden</code> <span class="pill p-warn">orphaned — no column uses it</span></td></tr>
+    </tbody>
+  </table>
+  <p><code>interests.status</code> and the verification tables' <code>status</code> / <code>entity_type</code> /
+     <code>review_decision</code> are <code>text</code> columns constrained by CHECK rather than true enums.</p>
+
+  <h3>7.4 Business rules enforced in the database</h3>
+  <table>
+    <thead><tr><th style="width:26%">Constraint</th><th style="width:20%">Table</th><th>Rule</th></tr></thead>
+    <tbody>
+      <tr><td><code>check_advance_logic</code></td><td><code>loads</code></td>
+        <td><code>advance</code> requires <code>advance_percentage = 100</code>; <code>partial_advance</code> requires 1–99;
+            <code>after_delivery</code> requires NULL. Payment semantics cannot be corrupted by a buggy client.</td></tr>
+      <tr><td><code>loads_advance_percentage_check</code></td><td><code>loads</code></td><td>If present, must be 1–100.</td></tr>
+      <tr><td><code>check_dates</code></td><td><code>availabilities</code></td><td><code>available_till</code> must be NULL or ≥ <code>available_from</code>.</td></tr>
+      <tr><td><code>users_phone_key</code></td><td><code>users</code></td><td>One account per phone number.</td></tr>
+      <tr><td><code>admin_alerts_load_id_key</code></td><td><code>admin_alerts</code></td><td>At most one alert per load.</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Availability <em>overlap</em> prevention — stopping a truck being double-booked across two date
+    windows — is enforced only in the client, by a query performed before insert. It is not a database
+    constraint, so a concurrent double submission can defeat it.
+  </p>
+
+  <h3>7.5 Index strategy</h3>
+  <p>
+    Roughly 41 indexes support the two dominant access patterns. Marketplace browsing is served by
+    route-and-date composites (<code>idx_loads_route_date</code> over origin, destination, loading date),
+    a partial index on open loads only (<code>idx_open_loads WHERE status = 'open'</code>), and status/date
+    indexes on availabilities. Ops screens are served by <code>created_at DESC</code> composites on
+    <code>audit_log</code>, <code>interests</code>, and the verification tables — matching the dashboard's default
+    newest-first sort.
+  </p>
+</section>
+
+<!-- ============ 8 ============ -->
+<section class="sec" id="s8">
+  <h2><span class="num">08</span>Core Data Flows</h2>
+
+  <h3>8.1 Posting a load (shipper)</h3>
+  <ol class="steps">
+    <li>The post screen loads the <code>locations</code> reference data for state and city pickers.</li>
+    <li>The shipper fills route, loading date, required truck category, capacity, and payment terms.</li>
+    <li>The client derives <code>advance_percentage</code> from <code>payment_type</code> — 100 for <code>advance</code>, the
+        user's figure for <code>partial_advance</code>, NULL for <code>after_delivery</code> — mirroring the database
+        CHECK so the insert cannot be rejected for that reason.</li>
+    <li><code>INSERT INTO loads</code> with <code>posted_by = auth.uid()</code>; <code>status</code> defaults to <code>open</code>.</li>
+    <li>An <code>admin_alerts</code> row is created for the load, surfacing it on the admin alerts screen.</li>
+    <li>The shipper is returned to their loads list.</li>
+  </ol>
+
+  <h3>8.2 Browsing and expressing interest (either side)</h3>
+  <p>
+    The market list screens issue a single PostgREST query with embedded joins — pulling the poster's
+    name and phone and both location rows in one round trip — filtered by route and date, ordered
+    newest first, and paginated with <code>.range()</code> at 20 rows per page. Two actions are available on
+    each card:
+  </p>
+  <table>
+    <thead><tr><th style="width:22%">Action</th><th style="width:26%">Effect</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Call</strong></td><td><code>Linking.openURL('tel:' + phone)</code></td>
+          <td>Hands off to the device dialer. The platform records nothing about the call — no duration,
+              no outcome, no confirmation it happened.</td></tr>
+      <tr><td><strong>Show Interest</strong></td><td><code>INSERT INTO interests</code></td>
+          <td>Writes <code>load_id</code> or <code>availability_id</code>, <code>interested_by</code>, <code>contacted_party</code>, and
+              <code>status = 'interested'</code>. This is the platform's only liquidity signal.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.3 Posting availability (truck owner)</h3>
+  <ol class="steps">
+    <li>Load the owner's own trucks plus the location reference data.</li>
+    <li>Owner selects a truck, an origin, up to two preferred destinations, and a date window.</li>
+    <li>Client-side validation rejects an inverted range or a start date in the past.</li>
+    <li>An overlap query checks for an existing availability on the same truck covering those dates.</li>
+    <li><code>INSERT INTO availabilities</code> with <code>status = 'available'</code>.</li>
+  </ol>
+
+  <h3>8.4 Verification — the one flow that crosses both applications</h3>
+  <p>
+    This is the only workflow where a mobile action is completed by a dashboard action. It is
+    therefore the most important interconnection in the platform.
+  </p>
+
+  <div class="diagram">
+    <div class="tier">
+      <div class="tier-label">Mobile — submit</div>
+      <div class="row">
+        <div class="box"><h5>1 · Pick documents</h5>
+          <ul><li>Truck: RC, insurance, licence, fitness</li>
+              <li>User (individual): Aadhaar, PAN, DL, other ID</li>
+              <li>User (organization): GST, company PAN, incorporation, trade licence</li></ul></div>
+        <div class="box"><h5>2 · Create submission</h5>
+          <ul><li><code>INSERT verification_submissions</code></li><li>Returns <code>submission.id</code></li></ul></div>
+        <div class="box"><h5>3 · Upload files</h5>
+          <ul><li>Per file: URI &rarr; blob &rarr; arrayBuffer</li><li>Storage upload to the scoped path</li></ul></div>
+      </div>
+    </div>
+    <div class="flow"><span class="arrow">&darr;</span>
+      <span class="lbl">INSERT verification_documents (batch) &nbsp;·&nbsp; UPDATE entity SET verification_status = 'pending'</span>
+      <span class="arrow">&darr;</span></div>
+    <div class="tier">
+      <div class="tier-label">Dashboard — review</div>
+      <div class="row">
+        <div class="box accent"><h5>4 · Queue</h5>
+          <ul><li>Users and trucks with <code>verification_status = 'pending'</code></li></ul></div>
+        <div class="box accent"><h5>5 · Inspect</h5>
+          <ul><li><code>GET /verification/submissions</code></li><li><code>GET /verification/documents</code></li>
+              <li><code>POST /verification/signed-url</code> &rarr; 300 s URL</li></ul></div>
+        <div class="box accent"><h5>6 · Decide</h5>
+          <ul><li><code>POST /verification/decision</code></li>
+              <li>Updates entity + submission</li><li>Writes <code>review_verification</code> audit row</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <p>
+    The decision handler performs two sequential updates — the entity's <code>verification_status</code>, then
+    the submission's <code>status</code>, <code>review_decision</code>, <code>reviewed_at</code>, <code>reviewed_by</code>, and any
+    <code>rejection_reason</code> — followed by a fire-and-forget audit write. The two updates are not wrapped
+    in a transaction, so a failure between them would leave the entity and its submission
+    disagreeing.
+  </p>
+
+  <p>
+    Back on mobile, the user's "My Documents" view reads their most recent submission and its
+    document rows, and opens each file through a 300-second signed URL generated by the anon client.
+    A rejected user can resubmit, which creates a new submission and returns the entity to
+    <code>pending</code>.
+  </p>
+
+  <h3>8.5 Dashboard record operations</h3>
+  <p>
+    Every ops screen is the same <code>CommonDataTable</code> component pointed at a different table. It
+    reads through the single generic <code>GET /api/admin/data</code> endpoint and writes through
+    <code>PATCH /api/admin/row</code>, which means adding a new ops screen requires no new API surface —
+    only a column configuration. Inline verification changes are permitted directly from the grid
+    when the current status is <code>pending</code> or <code>unverified</code>.
+  </p>
+</section>
+
+<!-- ============ 9 ============ -->
+<section class="sec" id="s9">
+  <h2><span class="num">09</span>Dashboard API Surface</h2>
+
+  <p>Nine route handlers, all under <code>/api/admin/</code>, all requiring
+     <code>requireDashboardAccess()</code> and a present service-role key.</p>
+
+  <table>
+    <thead><tr>
+      <th style="width:11%">Verb</th><th style="width:24%">Route</th><th style="width:12%">Access</th><th>Behaviour</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><code>GET</code></td><td><code>/data</code></td><td>admin, mod</td>
+        <td>Generic paginated read for any allowlisted table. Accepts <code>table</code>, <code>select</code>,
+            <code>page</code>, <code>pageSize</code> (max 100), <code>sortColumn</code>, <code>sortAsc</code>,
+            <code>searchColumn</code>/<code>searchValue</code> (UUID &rarr; <code>eq</code>, else <code>ilike</code>), a JSON
+            <code>filters</code> map, and a <code>dateColumn</code>/<code>dateFrom</code>/<code>dateTo</code> range.
+            Returns <code>{ data, count }</code>. <code>admin_alerts</code> is admin-only.</td></tr>
+      <tr><td><code>PATCH</code></td><td><code>/row</code></td><td>admin, mod</td>
+        <td>Updates one row after reducing the patch to the role's allowlist for that table.
+            Special-cases <code>admin_alerts.is_handled</code> by stamping <code>handled_at</code> and
+            <code>handled_by</code>. Derives a specific audit action from the payload. Returns 400 if no
+            field survives the allowlist.</td></tr>
+      <tr><td><code>DELETE</code></td><td><code>/row</code></td><td><span class="pill p-dang">admin</span></td>
+        <td>Deletes one row from <code>loads</code>, <code>availabilities</code>, <code>trucks</code>, <code>users</code>, or
+            <code>interests</code>. <code>admin_alerts</code> can never be deleted. Writes <code>delete_record</code>.</td></tr>
+      <tr><td><code>GET</code></td><td><code>/search</code></td><td>admin, mod</td>
+        <td>Global search (min 2 characters) across users, trucks, and loads in parallel, five results
+            each, returning a normalized <code>{ type, id, title, subtitle }</code> list.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/moderator/send-otp</code></td><td><span class="pill p-dang">admin</span></td>
+        <td>Validates <code>/^\+\d{10,15}$/</code>, rejects an existing phone with 409, sends the OTP.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/moderator/create</code></td><td><span class="pill p-dang">admin</span></td>
+        <td>Verifies the OTP, then upgrades or inserts the <code>users</code> row as <code>moderator</code>.</td></tr>
+      <tr><td><code>GET</code></td><td><code>/verification/submissions</code></td><td>admin, mod</td>
+        <td>Submissions for an <code>entity_type</code>, optionally narrowed by <code>entity_id</code> or <code>status</code>,
+            newest first.</td></tr>
+      <tr><td><code>GET</code></td><td><code>/verification/documents</code></td><td>admin, mod</td>
+        <td>Document rows for one <code>submission_id</code>, oldest first.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/verification/signed-url</code></td><td>admin, mod</td>
+        <td>Mints a 300-second signed URL. Only the <code>verification-docs</code> bucket is accepted.</td></tr>
+      <tr><td><code>POST</code></td><td><code>/verification/decision</code></td><td>admin, mod</td>
+        <td>Applies <code>verified</code> or <code>rejected</code> to the entity and closes the submission.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.1 Standard status codes</h3>
+  <table>
+    <thead><tr><th style="width:14%">Code</th><th>Meaning in this API</th></tr></thead>
+    <tbody>
+      <tr><td><code>400</code></td><td>Malformed parameters, or a patch whose every field was stripped by the allowlist</td></tr>
+      <tr><td><code>401</code></td><td>No valid session</td></tr>
+      <tr><td><code>403</code></td><td>Session exists but the role is not <code>admin</code>/<code>moderator</code>, or the role may not touch that table</td></tr>
+      <tr><td><code>409</code></td><td>Moderator creation against a phone number already in <code>users</code></td></tr>
+      <tr><td><code>503</code></td><td><code>SUPABASE_SERVICE_ROLE_KEY</code> is not configured — returned with setup guidance</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.2 Audit actions</h3>
+  <table>
+    <thead><tr><th style="width:26%">Action</th><th>Trigger</th></tr></thead>
+    <tbody>
+      <tr><td><code>update_record</code></td><td>Any PATCH with no more specific interpretation</td></tr>
+      <tr><td><code>delete_record</code></td><td>Any DELETE</td></tr>
+      <tr><td><code>verify_user</code> / <code>reject_user</code></td><td>PATCH of <code>users.verification_status</code></td></tr>
+      <tr><td><code>verify_truck</code> / <code>reject_truck</code></td><td>PATCH of <code>trucks.verification_status</code></td></tr>
+      <tr><td><code>mark_alert_handled</code></td><td>PATCH <code>admin_alerts.is_handled = true</code></td></tr>
+      <tr><td><code>close_record</code></td><td>PATCH of any <code>status</code> to <code>closed</code></td></tr>
+      <tr><td><code>create_moderator</code></td><td>New moderator inserted (not on role upgrade)</td></tr>
+      <tr><td><code>review_verification</code></td><td>Verification decision endpoint</td></tr>
+    </tbody>
+  </table>
+  <div class="warn">
+    <b>Audit durability</b>
+    Audit writes are fire-and-forget (<code>void writeAuditLog(...)</code>). A failed write is logged to the
+    console but never blocks or fails the request, so the audit trail is best-effort rather than
+    guaranteed. Under bypass mode the actor id is null.
+  </div>
+</section>
+
+<!-- ============ 10 ============ -->
+<section class="sec" id="s10">
+  <h2><span class="num">10</span>Security &amp; Authorization</h2>
+
+  <h3>10.1 Two enforcement systems</h3>
+  <table>
+    <thead><tr><th style="width:20%"></th><th style="width:40%">Mobile path</th><th>Dashboard path</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Credential</strong></td><td>anon key + per-user JWT</td><td><code>service_role</code> key (server-side only)</td></tr>
+      <tr><td><strong>Enforced by</strong></td><td>Postgres RLS policies</td><td>TypeScript in middleware and route handlers</td></tr>
+      <tr><td><strong>Enforced where</strong></td><td>Inside the database, per row</td><td>Before the query is issued</td></tr>
+      <tr><td><strong>Failure mode</strong></td><td>Silent — rows disappear from results</td><td>Loud — 401/403, or catastrophic if a check is omitted</td></tr>
+      <tr><td><strong>Reviewability</strong></td><td>Requires SQL inspection of live policies</td><td>Visible in code review and diffable in git</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.2 Access model by role</h3>
+  <table>
+    <thead><tr>
+      <th style="width:24%">Capability</th><th style="width:12%">Shipper</th><th style="width:13%">Truck owner</th>
+      <th style="width:11%">Broker</th><th style="width:13%">Moderator</th><th>Admin</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>Post loads</td><td>✔</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Post availabilities</td><td>—</td><td>✔</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Manage trucks</td><td>—</td><td>✔</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Browse the other side</td><td>✔ availabilities</td><td>✔ loads</td><td>✔ both (read-only)</td><td>via dashboard</td><td>via dashboard</td></tr>
+      <tr><td>Call / show interest</td><td>✔</td><td>✔</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Upload own KYC</td><td>✔</td><td>✔</td><td>✔</td><td>—</td><td>—</td></tr>
+      <tr><td>Review verifications</td><td>—</td><td>—</td><td>—</td><td>✔</td><td>✔</td></tr>
+      <tr><td>Edit records</td><td>own only</td><td>own only</td><td>—</td><td>status fields only</td><td>full allowlist</td></tr>
+      <tr><td>Delete records</td><td>own only</td><td>own only</td><td>—</td><td>✘</td><td>✔ (not alerts)</td></tr>
+      <tr><td>Leads, alerts, activity log</td><td>—</td><td>—</td><td>—</td><td>✘</td><td>✔</td></tr>
+      <tr><td>Create moderators</td><td>—</td><td>—</td><td>—</td><td>✘</td><td>✔</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.3 Representative RLS policies</h3>
+  <table>
+    <thead><tr><th style="width:16%">Table</th><th style="width:12%">Command</th><th>Condition</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3"><code>users</code></td><td>SELECT</td>
+        <td>Two policies coexist: <code>auth.uid() = id</code> for the own row, and a permissive <code>true</code>
+            making the user directory readable — which is what enables counterparty names and phone
+            numbers to appear on market cards.</td></tr>
+      <tr><td>INSERT</td><td><code>auth.uid() = id</code> — a user may only create their own profile row</td></tr>
+      <tr><td>UPDATE</td><td><code>auth.uid() = id</code></td></tr>
+      <tr><td rowspan="4"><code>trucks</code></td><td>SELECT</td>
+        <td>Ownership OR staff role OR <code>true</code> — the trailing <code>true</code> makes the whole fleet publicly
+            readable to any authenticated user</td></tr>
+      <tr><td>INSERT</td><td><code>owner_id = auth.uid()</code> AND the caller's role is <code>truck_owner</code></td></tr>
+      <tr><td>UPDATE</td><td>Owner may edit <em>only while</em> <code>verification_status = 'unverified'</code>; admins may
+          always edit — this is what locks a truck's specs once documents are under review</td></tr>
+      <tr><td>DELETE</td><td>Owner or admin</td></tr>
+      <tr><td><code>truck_variants</code>, <code>locations</code></td><td>SELECT</td><td>Open reference data</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    <b>Permissive-clause pattern</b>
+    Several read policies terminate in <code>OR true</code>, which makes the preceding ownership and role
+    checks decorative for SELECT. This is deliberate for a marketplace where both sides must see each
+    other's listings and contact details — but it means <em>any</em> authenticated account can enumerate
+    the full user and truck directory, including phone numbers. That is a scraping and competitor-
+    intelligence exposure, not a bug in the code.
+  </div>
+
+  <h3>10.4 Dashboard patch allowlist</h3>
+  <table>
+    <thead><tr><th style="width:18%">Table</th><th style="width:44%">Admin may patch</th><th>Moderator may patch</th></tr></thead>
+    <tbody>
+      <tr><td><code>users</code></td><td><code>name</code>, <code>role</code>, <code>verification_status</code>, <code>subscription_type</code></td><td><code>verification_status</code></td></tr>
+      <tr><td><code>loads</code></td><td><code>loading_date</code>, <code>truck_category_required</code>, <code>capacity_required</code>,
+          <code>payment_type</code>, <code>advance_percentage</code>, <code>rate_optional</code>, <code>status</code>, both location ids</td><td><code>status</code></td></tr>
+      <tr><td><code>trucks</code></td><td><code>category</code>, <code>variant_id</code>, <code>capacity_tons</code>, <code>gps_available</code>,
+          <code>permit_type</code>, <code>verification_status</code></td><td><code>verification_status</code></td></tr>
+      <tr><td><code>availabilities</code></td><td><code>available_from</code>, <code>available_till</code>, <code>expected_rate</code>,
+          <code>status</code>, <code>current_location</code>, both preferred destinations, both location ids</td><td><code>status</code></td></tr>
+      <tr><td><code>admin_alerts</code></td><td><code>is_handled</code></td><td>—</td></tr>
+      <tr><td><code>interests</code></td><td><code>status</code></td><td><code>status</code></td></tr>
+    </tbody>
+  </table>
+  <p><code>phone</code> and <code>email</code> are stripped from every patch body before any of this runs, on every
+     table, for every role — staff cannot rewrite a user's contact identity through the dashboard.</p>
+
+  <h3>10.5 Injection surface</h3>
+  <p>
+    The one place user-controlled text reaches PostgREST's query grammar is the <code>select</code> parameter
+    of <code>GET /api/admin/data</code>, which must support embedded joins. It is defended by a character
+    allowlist (<code>/^[\w\-,.*! ():]+$/</code>) and an 8 000-character cap; sort columns are restricted to
+    <code>/^[\w]+$/</code>. Everywhere else, values pass through the Supabase client's parameterized builders.
+  </p>
+</section>
+
+<!-- ============ 11 ============ -->
+<section class="sec" id="s11">
+  <h2><span class="num">11</span>Storage Subsystem</h2>
+
+  <table>
+    <thead><tr><th style="width:24%">Property</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>Bucket</td><td><code>verification-docs</code> — private; no public URLs are ever issued</td></tr>
+      <tr><td>Path convention</td><td><code>{entityType}/{entityId}/{submissionId}/{docKey}/{timestamp}-{filename}</code></td></tr>
+      <tr><td>Write path</td><td>Mobile only, via the authenticated anon client. Storage policies scope writes to
+          the caller's own entity prefix.</td></tr>
+      <tr><td>Upload mechanics</td><td>The picked file URI is fetched into a blob, converted to an
+          <code>ArrayBuffer</code>, and uploaded with an explicit content type — the reliable path on React
+          Native, where streaming uploads are not available.</td></tr>
+      <tr><td>Read path (mobile)</td><td>Anon client <code>createSignedUrl(path, 300)</code>, then handed to the OS
+          via <code>Linking.openURL</code>.</td></tr>
+      <tr><td>Read path (dashboard)</td><td><code>POST /api/admin/verification/signed-url</code> using the service-role
+          client, with the bucket name checked against a single-entry allowlist.</td></tr>
+      <tr><td>URL lifetime</td><td>300 seconds on both paths</td></tr>
+      <tr><td>Metadata</td><td>Every file has a <code>verification_documents</code> row carrying bucket, path, original
+          filename, MIME type, and byte size — so the database, not the bucket listing, is the index.</td></tr>
+      <tr><td>Retention</td><td class="p-warn">No deletion or retention policy is implemented. Documents from
+          superseded submissions remain in the bucket indefinitely.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <b>Data-protection note</b>
+    This bucket holds Aadhaar, PAN, driving licences, GST certificates, and vehicle registration
+    documents — the most sensitive data the platform touches. The controls in place (private bucket,
+    path-scoped writes, short-lived signed reads, full audit of every review) are appropriate. The
+    open items are retention and deletion, which are policy decisions rather than engineering gaps.
+  </div>
+</section>
+
+<!-- ============ 12 ============ -->
+<section class="sec" id="s12">
+  <h2><span class="num">12</span>Configuration &amp; Environments</h2>
+
+  <h3>12.1 Mobile — <code>LoadKaro/.env</code></h3>
+  <table>
+    <thead><tr><th style="width:34%">Variable</th><th style="width:12%">Required</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>EXPO_PUBLIC_SUPABASE_URL</code></td><td>Yes</td><td>Project endpoint</td></tr>
+      <tr><td><code>EXPO_PUBLIC_SUPABASE_ANON_KEY</code></td><td>Yes</td><td>Public anon key</td></tr>
+      <tr><td><code>EXPO_PUBLIC_SUPABASE_KEY</code></td><td>No</td><td>Legacy alias, used as a fallback</td></tr>
+      <tr><td><code>EXPO_PUBLIC_TEST_MODE</code></td><td>No</td><td>Set to <code>"false"</code> in every EAS build profile</td></tr>
+    </tbody>
+  </table>
+  <p>Only <code>EXPO_PUBLIC_</code>-prefixed variables reach the bundle. Everything in this file is public
+     by construction — no secret may be placed here.</p>
+
+  <h3>12.2 Dashboard — <code>admin-dashboard/.env.local</code></h3>
+  <table>
+    <thead><tr><th style="width:34%">Variable</th><th style="width:12%">Scope</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>NEXT_PUBLIC_SUPABASE_URL</code></td><td>Client + server</td><td>Project endpoint</td></tr>
+      <tr><td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td><td>Client + server</td><td>Browser login client</td></tr>
+      <tr><td><code>NEXT_PUBLIC_SUPABASE_KEY</code></td><td>Client + server</td><td>Alias fallback</td></tr>
+      <tr><td><code>SUPABASE_SERVICE_ROLE_KEY</code></td><td><span class="pill p-dang">Server only</span></td>
+          <td>RLS-bypassing key for all <code>/api/admin/*</code> operations. Absent &rarr; every route returns 503.</td></tr>
+      <tr><td><code>DASHBOARD_BYPASS_AUTH</code></td><td>Server</td><td><span class="pill p-dang">Dev only</span> — skips auth</td></tr>
+      <tr><td><code>NEXT_PUBLIC_DASHBOARD_BYPASS_AUTH</code></td><td>Client + server</td><td><span class="pill p-dang">Dev only</span> — shows bypass buttons</td></tr>
+    </tbody>
+  </table>
+
+  <h3>12.3 Shared-env bridge</h3>
+  <p>
+    <code>next.config.ts</code> maps <code>EXPO_PUBLIC_SUPABASE_URL</code>, <code>_ANON_KEY</code>, and <code>_KEY</code> onto their
+    <code>NEXT_PUBLIC_</code> equivalents, and the middleware falls back to the <code>EXPO_PUBLIC_</code> names when the
+    Next ones are unset. A single <code>.env</code> can therefore serve both applications during development.
+    This convenience must not be extended to the service-role key, which has no <code>EXPO_PUBLIC_</code>
+    counterpart and must never acquire one.
+  </p>
+
+  <h3>12.4 Environment topology</h3>
+  <div class="warn">
+    <b>Single-environment reality</b>
+    There is one Supabase project. No staging or preview project is configured, and no Supabase
+    branch workflow is in use. Combined with the absence of migration files, this means schema and
+    policy changes are made directly against the production database, with safety resting on manual
+    <code>rls_backup_*.sql</code> snapshots kept in the repository root. This is the platform's largest
+    operational risk and the clearest candidate for hardening.
+  </div>
+</section>
+
+<!-- ============ 13 ============ -->
+<section class="sec" id="s13">
+  <h2><span class="num">13</span>Build, Release &amp; Deployment</h2>
+
+  <h3>13.1 Mobile — EAS Build</h3>
+  <table>
+    <thead><tr><th style="width:20%">Profile</th><th style="width:18%">Artifact</th><th style="width:18%">Distribution</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><code>development</code></td><td>Dev client</td><td>Internal</td><td>Local development against a custom native runtime</td></tr>
+      <tr><td><code>preview</code></td><td>APK</td><td>Internal</td><td>Sideloaded QA builds</td></tr>
+      <tr><td><code>production</code></td><td>AAB</td><td>Store</td><td>Google Play submission</td></tr>
+      <tr><td><code>production-apk</code></td><td>APK</td><td>Direct</td><td>Direct distribution outside the store</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Build-critical configuration</h4>
+  <table>
+    <thead><tr><th style="width:30%">Setting</th><th style="width:20%">Value</th><th>Why it matters</th></tr></thead>
+    <tbody>
+      <tr><td><code>newArchEnabled</code></td><td><code>false</code></td>
+        <td>The React Native New Architecture is explicitly disabled; enabling it previously caused
+            APK launch crashes.</td></tr>
+      <tr><td>Android package</td><td><code>in.loadkaro.app</code></td><td>Store identity — immutable once published</td></tr>
+      <tr><td><code>appVersionSource</code></td><td><code>remote</code></td><td>EAS owns version-code increments</td></tr>
+      <tr><td>Expo plugins</td><td><code>datetimepicker</code>, <code>expo-font</code></td><td>The only native config plugins; a font
+          duplication issue here previously caused launch failures</td></tr>
+      <tr><td>Icons</td><td>Adaptive foreground + monochrome</td><td>Themed-icon support on Android 13+</td></tr>
+      <tr><td>EAS project</td><td><code>10b724fb-…</code>, owner <code>chanakyagts-organization</code></td><td>Build account binding</td></tr>
+    </tbody>
+  </table>
+
+  <h3>13.2 Dashboard</h3>
+  <p>
+    Standard Next.js: <code>npm --workspace admin-dashboard run build</code> then <code>… run start</code>. Because
+    the service-role key must stay server-side and middleware runs on every matched request, the
+    dashboard requires a Node server — it cannot be exported as a static site. No hosting
+    configuration (Vercel, Docker, CI workflow) is committed to the repository, so deployment is
+    currently a manual operation.
+  </p>
+
+  <h3>13.3 Backend</h3>
+  <p>
+    Managed by Supabase; nothing to deploy. Schema and policy changes are applied manually, as noted
+    in section 12.4.
+  </p>
+
+  <h3>13.4 Release checklist implied by the architecture</h3>
+  <ol class="steps">
+    <li>Confirm <code>DASHBOARD_BYPASS_AUTH</code> and <code>NEXT_PUBLIC_DASHBOARD_BYPASS_AUTH</code> are unset in the
+        deployed environment.</li>
+    <li>Confirm <code>SUPABASE_SERVICE_ROLE_KEY</code> is present server-side and absent from any client bundle.</li>
+    <li>Snapshot RLS policies to a dated <code>rls_backup_*.sql</code> before any policy change.</li>
+    <li>Verify SMS/DLT sender configuration — without it, no one can sign in.</li>
+    <li>Build the mobile app with <code>newArchEnabled: false</code> intact.</li>
+    <li>Smoke-test one full cross-application loop: upload a document on mobile, approve it on the
+        dashboard, and confirm the badge changes on mobile.</li>
+  </ol>
+</section>
+
+<!-- ============ 14 ============ -->
+<section class="sec" id="s14">
+  <h2><span class="num">14</span>Repository Layout</h2>
+
+  <pre>mobile App/                          <span class="c">npm workspaces root</span>
+├── package.json                     <span class="c">workspace definitions</span>
+├── README.md
+├── rls_backup_2026-05-25.sql        <span class="c">manual RLS snapshots — no migration system</span>
+├── rls_backup_2026-07-01.sql
+├── reports/                         <span class="c">audits, reviews, and this document</span>
+│
+├── LoadKaro/                        <span class="c">── EXPO MOBILE APP ──</span>
+│   ├── App.js · index.js
+│   ├── app.json · eas.json          <span class="c">Expo + build configuration</span>
+│   ├── navigation/                  <span class="c">RootNavigator, Shipper-, TruckOwner-</span>
+│   ├── screens/                     <span class="c">legacy stack (17) …</span>
+│   │   ├── shipper/                 <span class="c">… + redesigned shipper screens (5)</span>
+│   │   └── truckowner/              <span class="c">… + redesigned truck-owner screens (8)</span>
+│   ├── components/                  <span class="c">shared UI + components/shipper/ tab bar</span>
+│   ├── config/                      <span class="c">role routes, label maps, field configs (TS)</span>
+│   ├── store/authStore.ts           <span class="c">the only global state</span>
+│   ├── services/                    <span class="c">syncUserAfterOtp, loadUserProfile</span>
+│   ├── lib/                         <span class="c">supabase client, logger, verificationUpload</span>
+│   ├── hooks/ · utils/ · types/
+│   ├── i18n/                        <span class="c">en · hi · kn · te + LanguageContext</span>
+│   ├── theme/theme.js               <span class="c">navy/orange brand tokens</span>
+│   ├── android/ · assets/
+│   └── DOCS_*.md                    <span class="c">four in-repo reference documents</span>
+│
+└── admin-dashboard/                 <span class="c">── NEXT.JS DASHBOARD ──</span>
+    ├── middleware.ts                <span class="c">first auth gate</span>
+    ├── next.config.ts               <span class="c">EXPO_PUBLIC_ → NEXT_PUBLIC_ bridge</span>
+    ├── components.json              <span class="c">shadcn configuration</span>
+    ├── admin_dashboard_api_collection.json
+    └── src/
+        ├── app/
+        │   ├── login/
+        │   ├── admin/               <span class="c">13 route groups</span>
+        │   ├── moderator/           <span class="c">9 route groups</span>
+        │   └── api/admin/           <span class="c">9 route handlers</span>
+        ├── components/
+        │   ├── admin/               <span class="c">common-data-table, verification-docs-modal</span>
+        │   ├── dashboard/           <span class="c">shell, stats grid, global search, theme toggle</span>
+        │   ├── brand/apex.tsx       <span class="c">the logo motif</span>
+        │   └── ui/                  <span class="c">11 shadcn primitives</span>
+        └── lib/
+            ├── supabase/            <span class="c">client · server · server-auth · service-role · env</span>
+            ├── auth/                <span class="c">dashboard-access · dashboard-role · bypass</span>
+            ├── admin/patch-allowlist.ts
+            ├── schema/enums.ts      <span class="c">mirror of the Postgres enums</span>
+            └── audit.ts</pre>
+
+  <h3>14.1 Where to look when changing something</h3>
+  <table>
+    <thead><tr><th style="width:36%">If you are changing…</th><th>Start here</th></tr></thead>
+    <tbody>
+      <tr><td>Who can see or write what, on mobile</td><td>The RLS policies in Postgres — not the app code</td></tr>
+      <tr><td>Who can see or write what, on the dashboard</td><td><code>lib/auth/dashboard-access.ts</code> and
+          <code>lib/admin/patch-allowlist.ts</code></td></tr>
+      <tr><td>Adding a database column or enum value</td><td>Postgres, then <code>lib/schema/enums.ts</code>, then the
+          mobile <code>config/*Labels.ts</code> maps — all three, by hand</td></tr>
+      <tr><td>Adding a dashboard ops screen</td><td>A new page using <code>CommonDataTable</code>; no new API route is
+          usually required</td></tr>
+      <tr><td>Adding a mobile screen for shipper or truck owner</td><td>The role's navigator plus its
+          <code>screens/&lt;role&gt;/</code> directory</td></tr>
+      <tr><td>Any user-visible string</td><td>All four dictionaries in <code>i18n/</code></td></tr>
+      <tr><td>Brand colours</td><td><code>theme/theme.js</code> (mobile) and the Tailwind token layer (dashboard) —
+          these are two separate palettes</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 15 ============ -->
+<section class="sec" id="s15">
+  <h2><span class="num">15</span>Architectural Observations</h2>
+
+  <p>
+    Recorded as findings of the discovery, not as a remediation plan. Severity reflects the risk to
+    the platform, not the effort to address it.
+  </p>
+
+  <h3>15.1 Structural strengths</h3>
+  <ul>
+    <li><strong>One backend, one schema.</strong> With no service mesh and no inter-app API, there is a single
+        source of truth and a very small operational surface for a team of this size.</li>
+    <li><strong>Defence in depth on the dashboard.</strong> Middleware, a per-handler access check, a table
+        allowlist, a per-role column allowlist, unconditional PII stripping, and an audit row — five
+        independent controls in front of a key that bypasses the database's own security.</li>
+    <li><strong>Business rules in the database.</strong> The payment/advance logic is a CHECK constraint, so no
+        client bug can produce a load with incoherent payment terms.</li>
+    <li><strong>One generic data endpoint.</strong> Every ops screen reuses <code>/api/admin/data</code> and
+        <code>CommonDataTable</code>, so the audited attack surface stays constant as screens are added.</li>
+    <li><strong>Field-realistic engineering.</strong> The 30-second fetch timeout, the offline banner, the
+        400 ms auth-listener debounce, and four Indian languages are all responses to how the target
+        user actually connects.</li>
+  </ul>
+
+  <h3>15.2 Findings</h3>
+  <table>
+    <thead><tr><th style="width:6%">#</th><th style="width:24%">Finding</th><th style="width:11%">Severity</th><th>Detail</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Production is the only environment</td><td><span class="pill p-dang">High</span></td>
+        <td>One Supabase project, no migrations, no staging, no branch workflow. Schema and RLS changes
+            are applied live, with only manual SQL snapshots as a rollback path.</td></tr>
+      <tr><td>2</td><td>Enum definitions triplicated</td><td><span class="pill p-dang">High</span></td>
+        <td>Postgres, <code>lib/schema/enums.ts</code>, and the mobile label configs must be edited together.
+            Nothing enforces it; drift surfaces as unlabelled values in production UI. Generated types
+            exist as a Supabase capability but are not wired into either build.</td></tr>
+      <tr><td>3</td><td>Bypass flags are a live production hazard</td><td><span class="pill p-dang">High</span></td>
+        <td>A single stray environment variable converts the dashboard into an unauthenticated,
+            <code>service_role</code>-backed interface to the entire database.</td></tr>
+      <tr><td>4</td><td>Directory-wide readability</td><td><span class="pill p-warn">Medium</span></td>
+        <td><code>OR true</code> in the user and truck SELECT policies lets any authenticated account enumerate
+            all users — names and phone numbers included — and all vehicles. Necessary for the
+            marketplace to function as designed, but it is an open scraping surface.</td></tr>
+      <tr><td>5</td><td>Verification decision is not transactional</td><td><span class="pill p-warn">Medium</span></td>
+        <td>Entity status and submission status are two sequential updates. A failure between them
+            leaves them inconsistent, with no reconciliation process.</td></tr>
+      <tr><td>6</td><td>Audit trail is best-effort</td><td><span class="pill p-warn">Medium</span></td>
+        <td>Fire-and-forget writes mean a mutation can succeed with no audit record. For a log intended
+            to support compliance, this weakens the guarantee it exists to provide.</td></tr>
+      <tr><td>7</td><td>No error or usage telemetry</td><td><span class="pill p-warn">Medium</span></td>
+        <td>No crash reporter and no analytics on either surface. A mobile crash in the field is
+            invisible; funnel questions can only be answered by querying the database directly.</td></tr>
+      <tr><td>8</td><td>Availability overlap enforced client-side only</td><td><span class="pill p-warn">Medium</span></td>
+        <td>A pre-insert query, not a constraint. Concurrent submissions can double-book a truck.</td></tr>
+      <tr><td>9</td><td>Single-channel authentication</td><td><span class="pill p-warn">Medium</span></td>
+        <td>SMS OTP is the only way into the mobile app. An SMS or DLT disruption is a total
+            acquisition outage with no fallback path.</td></tr>
+      <tr><td>10</td><td>Two UI generations coexist</td><td><span class="pill p-navy">Low</span></td>
+        <td>Redesigned navigators for shipper and truck owner sit alongside the legacy stack that still
+            serves brokers. The truck-owner navigator imports the shipper's tab bar, and tab state is
+            local component state that resets on remount.</td></tr>
+      <tr><td>11</td><td>No document retention policy</td><td><span class="pill p-navy">Low</span></td>
+        <td>Superseded KYC files persist in the bucket indefinitely. A policy decision, but one with
+            data-protection implications given what the bucket holds.</td></tr>
+      <tr><td>12</td><td>Dead schema objects</td><td><span class="pill p-navy">Low</span></td>
+        <td><code>load_rate_visibility_enum</code> is referenced by no column; <code>subscription_type</code> is
+            populated but unused by any feature.</td></tr>
+      <tr><td>13</td><td>No CI and no automated tests</td><td><span class="pill p-navy">Low</span></td>
+        <td>No test runner or workflow configuration is committed. Every change is validated manually,
+            which compounds findings 1 and 2.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============ 16 ============ -->
+<section class="sec" id="s16">
+  <h2><span class="num">16</span>Sources &amp; Verification</h2>
+
+  <p>Discovery was performed by direct inspection of the repository on 11 August 2026.</p>
+
+  <h3>16.1 Verified against live code</h3>
+  <table>
+    <thead><tr><th style="width:38%">Fact set</th><th>Source read</th></tr></thead>
+    <tbody>
+      <tr><td>Every dependency and version in section 03</td><td>Both <code>package.json</code> files</td></tr>
+      <tr><td>Mobile client construction, timeout, session options</td><td><code>LoadKaro/lib/supabase.js</code></td></tr>
+      <tr><td>Navigator structure, tab definitions, screen inventory</td><td><code>navigation/*.js</code>,
+          <code>screens/</code>, <code>screens/shipper/</code>, <code>screens/truckowner/</code></td></tr>
+      <tr><td>Build profiles, package id, New Architecture flag</td><td><code>app.json</code>, <code>eas.json</code></td></tr>
+      <tr><td>Dashboard route and API inventory</td><td><code>src/app/</code> directory tree</td></tr>
+      <tr><td>Dashboard library organization</td><td><code>src/lib/</code>, <code>src/components/</code> trees</td></tr>
+      <tr><td>Brand tokens</td><td><code>theme/theme.js</code></td></tr>
+      <tr><td>Language coverage</td><td><code>i18n/</code> — four dictionaries, ~355 keys</td></tr>
+      <tr><td>Environment variable contracts</td><td><code>.env.example</code> files, root <code>README.md</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>16.2 Sourced from in-repo documentation</h3>
+  <p>
+    Sections 07 and parts of 05, 06, 08, 09, and 10 — the schema catalogue, index list, RLS policy
+    text, API parameter tables, and audit action list — are drawn from
+    <code>LoadKaro/DOCS_SUPABASE_DATABASE.md</code> and <code>LoadKaro/DOCS_SYSTEM_ARCHITECTURE.md</code>. Those
+    documents record a live introspection dated <strong>8 April 2026</strong>.
+  </p>
+
+  <div class="warn">
+    <b>Verification gap</b>
+    A live re-introspection of the database was attempted for this document and could not be
+    completed — the Supabase management connection returned an authorization error. Two RLS
+    migrations are known to have been applied after the April introspection (snapshots dated
+    <strong>25 May 2026</strong> and <strong>1 July 2026</strong> sit in the repository root), so the policy text in
+    section 10 should be treated as <em>indicative of the model</em> rather than a byte-exact copy of the
+    policies now in force. Table structure, foreign keys, enums, and constraints are unlikely to have
+    changed, since those migrations targeted policies. Re-running introspection with a valid
+    Supabase access token would close this gap.
+  </div>
+
+  <h3>16.3 Companion documents in this repository</h3>
+  <table>
+    <thead><tr><th style="width:44%">Document</th><th>Covers</th></tr></thead>
+    <tbody>
+      <tr><td><code>LoadKaro/DOCS_SYSTEM_ARCHITECTURE.md</code></td><td>Flow diagrams, API reference, role matrix</td></tr>
+      <tr><td><code>LoadKaro/DOCS_SUPABASE_DATABASE.md</code></td><td>Full schema, indexes, RLS policy text</td></tr>
+      <tr><td><code>LoadKaro/DOCS_MOBILE_APP.md</code></td><td>Screen-by-screen mobile reference</td></tr>
+      <tr><td><code>LoadKaro/DOCS_ADMIN_DASHBOARD.md</code></td><td>Dashboard component and page reference</td></tr>
+      <tr><td><code>reports/02_SECURITY_AND_COMPLETENESS_AUDIT.md</code></td><td>Prior security audit</td></tr>
+      <tr><td><code>reports/06_BLOCKERS_AND_PREWARNINGS.md</code></td><td>Launch blockers</td></tr>
+      <tr><td><code>QA_IMPLEMENTATION_HISTORY.md</code></td><td>QA defect history</td></tr>
+    </tbody>
+  </table>
+
+  <div class="footnote">
+    LoadKaro Platform Discovery Document · Revision 1.0 · 11 August 2026 ·
+    Generated from repository inspection. Section 16.2 records the one area where facts were
+    inherited rather than re-verified.
+  </div>
+</section>
+
+</body>
+</html>
