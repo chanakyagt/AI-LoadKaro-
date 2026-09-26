@@ -1,0 +1,8 @@
+[submodule "LoadKaro"]
+	path = LoadKaro
+	url = https://github.com/chanakyagt/Load_karo_initial.git
+	branch = LOADKARO-final-testing
+[submodule "admin-dashboard"]
+	path = admin-dashboard
+	url = https://github.com/chanakyagt/LoadKaro-dashbopard-app-before-documents-verification-options.git
+	branch = main
