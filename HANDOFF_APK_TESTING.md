@@ -23,8 +23,8 @@ Written 2026-10-04 for the next Claude session. Read all of this before acting.
 | CRM + portal | Built in `admin-dashboard` (Matching, Pipeline, Support, KYC desks + `/portal`), pushed. |
 | Code location | App: `LoadKaro/` (branch `LOADKARO-final-testing`, pushed). Parent repo pushed to branch `loadkaro-app` (GitHub `main` is an unrelated project — never push there). |
 
-**Build under test** (contains everything above, commit `c1af036`):
-https://expo.dev/artifacts/eas/C_lWGsxwTzu11cUzkKUkrWG_qpCHntQxd56sEm75X5w.apk
+**Build under test** (contains everything above PLUS coordinate matching, app commit `214f817`):
+https://expo.dev/artifacts/eas/C8QgcJOxjLBL12K_rN0Ofjux4GIpntKEcMeoRZxhtoM.apk
 
 **Emulator on this machine:** AVD `Medium_Phone_API_36.1`.
 
@@ -92,6 +92,22 @@ the role in the table, using the name `Test Shipper`, `Test Owner` or `Test Brok
 
 **E. Profile lock (any role, only if an account is already verified)**
 - [ ] Editing the name on a verified profile shows a locked/"contact support" message rather than saving
+
+**F. Near-me matching (new in this build; spec: `docs/MATCHING_SPEC.md`)**
+- [ ] First open of Find Trucks / Find Loads asks for **approximate** location once 📸
+- [ ] Allow it (with Mobile MCP's set-location, put the device near Ballari, ~15.14, 76.92) → the bar says "Near Ballari" 📸
+- [ ] Deny it (fresh install) → message asks you to pick a city; "Change" opens a city search and picking one updates the bar
+- [ ] The location button (crosshair) re-detects; no second permission prompt after the first answer
+- [ ] With live postings within 100 km: cards show "about X km away"; nearest first 📸
+- [ ] Shipper with an open load: truck cards show a fit label (Good fit / Different truck type / Truck too small / Dates don't match) and a note naming the load it compares against 📸
+- [ ] Truck owner: **no** fit labels on loads, only distance and "On your way"
+- [ ] Nothing within 100 km → note "Nothing within 100 km of … Showing everything" and the newest-first list (not an empty screen)
+- [ ] Typing a route in the search bar still filters exactly as before; clearing it returns to near-me order
+- [ ] Profile footer shows "City locations © GeoNames (CC BY 4.0)"
+
+There are no live listings right now, so the distance/fit items will be ⏭ blocked
+unless the founder has posted real ones. Don't create listings to unblock them;
+report and ask.
 
 ### Expected blockers (report them, don't work around them)
 
