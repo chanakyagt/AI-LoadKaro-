@@ -23,8 +23,8 @@ Written 2026-10-04 for the next Claude session. Read all of this before acting.
 | CRM + portal | Built in `admin-dashboard` (Matching, Pipeline, Support, KYC desks + `/portal`), pushed. |
 | Code location | App: `LoadKaro/` (branch `LOADKARO-final-testing`, pushed). Parent repo pushed to branch `loadkaro-app` (GitHub `main` is an unrelated project — never push there). |
 
-**Build under test** (everything above + coordinate matching + security hardening, app commit `40e4a8f`):
-https://expo.dev/artifacts/eas/w2EcGPXFfPogKpIX7U4yXDbnWSGNUDNw_YIwSVkH5fg.apk
+**Build under test** (everything above + matching + security + 10-13 fixes + Kannada text fix, app commit `ead4fc8`):
+https://expo.dev/artifacts/eas/kkU8UgStctADadsQ5Zxo_Xut1Ffjutr8aBaBcvQ_1jM.apk
 
 **Emulator on this machine:** AVD `Medium_Phone_API_36.1`.
 
