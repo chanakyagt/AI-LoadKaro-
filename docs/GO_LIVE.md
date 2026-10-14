@@ -15,10 +15,10 @@ Two Netlify sites, one Play Store listing, one Supabase project.
 
 1. **SMS for OTP works for real numbers.** Supabase → Authentication → Providers → Phone. Until the DLT/MSG91 registration is live, check that a real (non-test) Indian number receives a code. If not, nobody but the test numbers can sign in.
 2. **Privacy policy URL** (required by Play): what you collect (phone, name, KYC documents, approximate location) and why. Host it on the website or as a public page.
-3. **Rotate secrets** (they passed through many sessions): Supabase → Project Settings → API → roll the **service-role key**; put the new one in Netlify (step B4). Revoke old **access tokens** at supabase.com/dashboard/account/tokens.
+3. **Rotate secrets** (they passed through many sessions): Supabase → Project Settings → API → roll the **service-role key**; put the new one in Netlify (step B2). Revoke old **access tokens** at supabase.com/dashboard/account/tokens.
 4. **One test pass on a phone** with the latest APK (`HANDOFF_APK_TESTING.md`).
-6. **Remove leftover EAS variables** `EXPO_PUBLIC_TEST_MODE` and `EXPO_PUBLIC_TEST_OTP` from both the preview and production environments (expo.dev → project → Environment variables). No code reads them, so they are not in the app — this is housekeeping.
-5. **After testing: delete the 150 test phone numbers** (Authentication → Phone → Test phone numbers) — they share one fixed OTP and work on the live database.
+5. **Remove leftover EAS variables** `EXPO_PUBLIC_TEST_MODE` and `EXPO_PUBLIC_TEST_OTP` from both the preview and production environments (expo.dev → project → Environment variables). No code reads them, so they are not in the app — this is housekeeping.
+6. **After testing: delete the 150 test phone numbers** (Authentication → Phone → Test phone numbers) — they share one fixed OTP and work on the live database.
 
 ## A. Mobile app → Google Play
 
