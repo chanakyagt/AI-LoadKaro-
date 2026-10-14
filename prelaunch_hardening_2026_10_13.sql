@@ -1,4 +1,6 @@
--- Pre-launch DB hardening, 2026-10-13. NOT YET APPLIED.
+-- Pre-launch DB hardening, 2026-10-13. APPLIED 2026-10-14 as migration prelaunch_hardening_2026_10_13,
+-- followed immediately by fix_availability_policy_recursion (see the end of this file): as written,
+-- rule 3 made availabilities and trucks policies reference each other and every availability post failed.
 -- From the 2026-10-13 review. Original definitions are in rls_backup_2026-10-13.sql.
 -- Apply via Supabase SQL Editor (project ffbbujudebmtbuyssnsn) or the Supabase MCP apply_migration.
 -- Left out on purpose (need founder decision): expiry window for availabilities with no end date,
@@ -265,3 +267,22 @@ create index if not exists idx_ver_sub_reviewed_by on public.verification_submis
 create index if not exists idx_ver_sub_submitted_by on public.verification_submissions(submitted_by);
 
 commit;
+
+-- ---------------------------------------------------------------------------
+-- APPLIED 2026-10-14 right after the above, as migration fix_availability_policy_recursion.
+-- Rule 3 above read public.trucks inside the availabilities policies while the
+-- trucks SELECT policy reads public.availabilities -> "infinite recursion
+-- detected in policy". A SECURITY DEFINER helper breaks the cycle.
+create or replace function public.caller_owns_truck(p_truck_id uuid)
+returns boolean language sql stable security definer set search_path = public, pg_temp as $$
+  select exists (select 1 from public.trucks t where t.id = p_truck_id and t.owner_id = (select auth.uid()));
+$$;
+revoke execute on function public.caller_owns_truck(uuid) from public, anon;
+grant execute on function public.caller_owns_truck(uuid) to authenticated;
+alter policy "insert availabilities" on public.availabilities with check (
+  owner_id = (select auth.uid())
+  and exists (select 1 from public.users where id = (select auth.uid()) and role in ('truck_owner','broker'))
+  and public.caller_owns_truck(truck_id));
+alter policy "update availabilities" on public.availabilities with check (
+  (owner_id = (select auth.uid()) and public.caller_owns_truck(truck_id))
+  or exists (select 1 from public.users where id = (select auth.uid()) and role in ('admin','moderator')));
